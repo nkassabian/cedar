@@ -13,7 +13,7 @@ Cedar is currently in development and not yet ready for public use. However, if 
 
 ## Contributors
 
-- [Your Name Here]
+- DevilDerp
 
 ## License
 
