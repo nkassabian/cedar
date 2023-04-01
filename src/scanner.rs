@@ -125,13 +125,18 @@ impl Scanner {
     }
 
     fn check_for_comments(&mut self) {
+        //Check for multi line
+        if self.peek('-') {
+            self.next();
+        }
+
         if self.peek('/') {
             self.next();
             self.next();
             while !self.peek('\n') && !self.is_eof() {
                 self.next();
             }
-            self.next();
+            self.next_line();
         } else {
             self.add_token(TokenType::SLASH);
         }
@@ -143,11 +148,10 @@ impl Scanner {
     }
 
     fn string(&mut self) -> Result<(), KayLanError> {
-        println!("{}", "In string func");
         self.next();
-
         while !self.peek('"') && !self.is_eof() {
-            if !self.peek('\n') {
+            self.next();
+            if self.peek('\n') {
                 self.next_line();
             }
         }
@@ -156,8 +160,9 @@ impl Scanner {
                 self.line,
                 self.offset,
                 "Lexer Error".to_string(),
-                format!("{} \"{}\".", "Unexpecter end of string. Expected", "\""),
+                format!("{} \"{}\".", "Unexpecter end of string. Expected", "'\'"),
                 self.file_name.clone(),
+                self.source.clone(),
             ));
         }
 
@@ -211,6 +216,7 @@ impl Scanner {
                         "Invalid end of number.", "Numbers cannot endw with a floating point."
                     ),
                     self.file_name.clone(),
+                    self.source.clone(),
                 ));
             }
         }
@@ -226,6 +232,7 @@ impl Scanner {
                     "Lexer Error".to_string(),
                     format!("{} \"{}\".", "Invalid number", value),
                     self.file_name.clone(),
+                    self.source.clone(),
                 ));
             }
         };
@@ -308,11 +315,10 @@ impl Scanner {
                             "Lexer Error".to_string(),
                             format!("{} \"{}\".", "Unexpecter charater :", c.to_string()),
                             self.file_name.clone(),
+                            self.source.clone(),
                         ));
                     }
-                } // {
-
-                  // }
+                }
             }
         }
         Ok(())

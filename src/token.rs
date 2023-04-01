@@ -3,7 +3,7 @@ use once_cell::sync::Lazy;
 use crate::token_type::*;
 use core::fmt;
 use std::collections::HashMap;
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Object {
     Num(f64),
     //Str(String),
@@ -24,12 +24,12 @@ impl fmt::Display for Object {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Token {
     ttype: TokenType,
-    lexeme: String,
+    pub lexeme: String,
     literal: Object,
-    line: usize,
+    pub line: usize,
     position: usize,
 }
 
@@ -74,6 +74,17 @@ impl fmt::Display for Token {
 pub static KEYWORDS: Lazy<HashMap<String, TokenType>> = Lazy::new(|| {
     let mut map = HashMap::new();
     map.insert(String::from("var"), TokenType::VAR);
+    map.insert(String::from("for"), TokenType::FOR);
+    map.insert(String::from("have"), TokenType::HAVE);
+    map.insert(String::from("func"), TokenType::FUNC);
+    map.insert(String::from("else"), TokenType::ELSE);
+    map.insert(String::from("class"), TokenType::CLASS);
+    map.insert(String::from("if"), TokenType::IF);
+    map.insert(String::from("&&"), TokenType::AND);
+    map.insert(String::from("||"), TokenType::OR);
+    map.insert(String::from("while"), TokenType::WHILE);
+    map.insert(String::from("show"), TokenType::PRINT);
+    map.insert(String::from("ret"), TokenType::RETURN);
 
     map
 });

@@ -4,6 +4,8 @@ use error::*;
 mod scanner;
 mod token_type;
 
+// mod expr;
+
 use scanner::*;
 use std::env::args;
 use std::io::{self, stdout, BufRead, Write};
