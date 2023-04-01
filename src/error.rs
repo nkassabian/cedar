@@ -1,5 +1,3 @@
-use std::os::unix::process;
-
 use ansi_term::Colour::{Black, Blue, Purple, Red, Yellow};
 
 #[derive(Debug)]
