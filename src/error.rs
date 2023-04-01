@@ -100,7 +100,7 @@ fn get_line(line: usize, error_line: &String, line_num: i32) -> String {
                 "{}\n",
                 Black.paint(format!(
                     "{} | {}",
-                    ("0".to_string() + &(line - 1).to_string()),
+                    ("0".to_string() + &(line + 1).to_string()),
                     &error_line[find_nth_index(&error_line, '\n', line).unwrap() + 1
                         ..find_nth_index(&error_line, '\n', line + 1).unwrap()]
                 ))
