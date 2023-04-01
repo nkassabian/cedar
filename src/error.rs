@@ -1,3 +1,5 @@
+use std::os::unix::process;
+
 use ansi_term::Colour::{Black, Blue, Purple, Red, Yellow};
 
 #[derive(Debug)]
@@ -40,54 +42,25 @@ impl KayLanError {
         for token in self.source_toks {
             line = format!("{}{}", line, token.to_string());
         }
-        // println!("{:?}", find_nth_index(&line, '\n', self.line).unwrap());
-        // println!("{:?}", find_nth_index(&line, '\n', self.line + 1).unwrap());
-        // println!(
-        //     "{:?}",
-        //     &line[find_nth_index(&line, '\n', self.line - 1).unwrap() + 1
-        //         ..find_nth_index(&line, '\n', self.line).unwrap()]
-        // );
-        //
+
+        let mut error_line: String = " ".to_string();
 
         if self.line < 10 {
-            println!(
-                "{}\n",
-                Black.paint(format!(
-                    "{} | {}",
-                    ("0".to_string() + &(&self.line - 1).to_string()),
-                    &line[find_nth_index(&line, '\n', self.line - 2).unwrap() + 1
-                        ..find_nth_index(&line, '\n', self.line - 1).unwrap()]
-                ))
-            );
-            println!(
-                "{} | {}",
-                ("0".to_string() + &self.line.to_string()),
-                &line[find_nth_index(&line, '\n', self.line - 1).unwrap() + 1
-                    ..find_nth_index(&line, '\n', self.line).unwrap()]
-            );
-            println!(
-                "{}",
-                Red.bold()
-                    .paint(create_string_with_spaces(self.column + 2, '^'))
-            );
-
-            if (find_nth_index(&line, '\n', self.line).unwrap() + 1)
-                != find_nth_index(&line, '\n', self.line + 1).unwrap() + 1
-            {
-                println!(
+            error_line = format!(
+                "{}\n{}\n{}\n{}\n",
+                format!("{}", get_line(self.line, &line, -1)),
+                format!("{}", get_line(self.line, &line, 0)),
+                format!(
                     "{}",
-                    Black.paint(format!(
-                        "{} | {}",
-                        ("0".to_string() + &(&self.line + 1).to_string()),
-                        &line[find_nth_index(&line, '\n', self.line).unwrap() + 1
-                            ..find_nth_index(&line, '\n', self.line + 1).unwrap()]
-                    ))
-                );
-            }
+                    Red.bold()
+                        .paint(create_string_with_spaces(self.column + 2, '^'))
+                ),
+                format!("{}", get_line(self.line, &line, 1))
+            )
         }
 
         eprint!(
-            "\n\n[{}]->{}::{}\n\n",
+            "\n\n[{}]->{}::{}\n\n{}",
             Yellow.bold().paint(self.file_name),
             format!(
                 "{}:{}",
@@ -95,7 +68,48 @@ impl KayLanError {
                 Purple.bold().paint(self.column.to_string())
             ),
             format!("{}, {}", Blue.bold().paint(self.main_message), self.message),
-        )
+            error_line
+        );
+        std::process::exit(64);
+    }
+}
+
+fn get_line(line: usize, error_line: &String, line_num: i32) -> String {
+    if line_num == -1 {
+        return format!(
+            "{}\n",
+            Black.paint(format!(
+                "{} | {}",
+                ("0".to_string() + &(line - 1).to_string()),
+                &error_line[find_nth_index(&error_line, '\n', line - 2).unwrap() + 1
+                    ..find_nth_index(&error_line, '\n', line - 1).unwrap()]
+            ))
+        );
+    } else if line_num == 0 {
+        return format!(
+            "{} | {}",
+            ("0".to_string() + &line.to_string()),
+            &error_line[find_nth_index(&error_line, '\n', line - 1).unwrap() + 1
+                ..find_nth_index(&error_line, '\n', line).unwrap()]
+        );
+    } else if line_num == 1 {
+        if (find_nth_index(&error_line, '\n', line).unwrap() + 1)
+            != find_nth_index(&error_line, '\n', line + 1).unwrap() + 1
+        {
+            return format!(
+                "{}\n",
+                Black.paint(format!(
+                    "{} | {}",
+                    ("0".to_string() + &(line - 1).to_string()),
+                    &error_line[find_nth_index(&error_line, '\n', line).unwrap() + 1
+                        ..find_nth_index(&error_line, '\n', line + 1).unwrap()]
+                ))
+            );
+        } else {
+            return " ".to_string();
+        }
+    } else {
+        return " ".to_string();
     }
 }
 
