@@ -1,4 +1,6 @@
 mod error;
+mod expr;
+mod parser;
 mod token;
 use error::*;
 mod scanner;
@@ -6,6 +8,7 @@ mod token_type;
 
 // mod expr;
 
+use parser::Parser;
 use scanner::*;
 use std::env::args;
 use std::io::{self, stdout, BufRead, Write};
@@ -55,9 +58,12 @@ fn run(source: String, file_name: String) -> Result<(), KayLanError> {
     let mut scanner = Scanner::new(source.chars().collect(), file_name);
     let tokens = scanner.scan_tokens();
 
-    for token in tokens? {
-        println!("{:?}", token);
-    }
+    // for token in tokens? {
+    //     println!("{:?}", token);
+    // }
+    let mut parser = Parser::new(tokens.unwrap().clone());
+    parser.expression();
+
     Ok(())
 }
 

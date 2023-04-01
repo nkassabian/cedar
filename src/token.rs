@@ -6,29 +6,29 @@ use std::collections::HashMap;
 #[derive(Debug, Clone)]
 pub enum Object {
     Num(f64),
-    //Str(String),
+    Str(String),
     Nil,
-    //True,
-    //False,
+    True,
+    False,
 }
 
 impl fmt::Display for Object {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Object::Num(x) => write!(f, "{x}"),
-            //Object::Str(x) => write!(f, "\"{x}\""),
+            Object::Str(x) => write!(f, "\"{x}\""),
             Object::Nil => write!(f, "Nil"),
-            //Object::True => write!(f, "True"),
-            //Object::False => write!(f, "False"),
+            Object::True => write!(f, "True"),
+            Object::False => write!(f, "False"),
         }
     }
 }
 
 #[derive(Debug, Clone)]
 pub struct Token {
-    ttype: TokenType,
+    pub ttype: TokenType,
     pub lexeme: String,
-    literal: Object,
+    pub literal: Object,
     pub line: usize,
     position: usize,
 }
@@ -60,10 +60,10 @@ impl fmt::Display for Token {
             self.lexeme,
             match &self.literal {
                 Object::Num(x) => x.to_string(),
-                //Object::Str(x) => format!("\"{}\"", x),
+                Object::Str(x) => format!("\"{}\"", x),
                 Object::Nil => "Nil".to_string(),
-                //Object::True => "True".to_string(),
-                //Object::False => "False".to_string(),
+                Object::True => "True".to_string(),
+                Object::False => "False".to_string(),
             },
             self.line,
             self.position
@@ -85,6 +85,9 @@ pub static KEYWORDS: Lazy<HashMap<String, TokenType>> = Lazy::new(|| {
     map.insert(String::from("while"), TokenType::WHILE);
     map.insert(String::from("show"), TokenType::PRINT);
     map.insert(String::from("ret"), TokenType::RETURN);
+    map.insert(String::from("null"), TokenType::NIL);
+    map.insert(String::from("true"), TokenType::TRUE);
+    map.insert(String::from("false"), TokenType::FALSE);
 
     map
 });

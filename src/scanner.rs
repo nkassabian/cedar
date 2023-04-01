@@ -249,7 +249,11 @@ impl Scanner {
     }
 
     fn is_alpha(&mut self, c: char) -> bool {
-        return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
+        return (c >= 'a' && c <= 'z')
+            || (c >= 'A' && c <= 'Z')
+            || c == '_'
+            || c == '|'
+            || c == '&';
     }
 
     fn is_alpha_numeric(&mut self, c: char) -> bool {

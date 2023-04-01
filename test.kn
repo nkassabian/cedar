@@ -1,6 +1,6 @@
-//This is a comment
-for () {}
-have y = 24.65;
-"Hello World"
-let x = 5;~
-have x = 240000000000000000000;
+/-
+    This is a block
+-/
+for(a == b && b >= a){
+    ret a;
+}

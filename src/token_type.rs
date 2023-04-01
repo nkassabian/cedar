@@ -1,4 +1,4 @@
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum TokenType {
     // Single-character tokens.
     LEFTPAREN,
@@ -32,17 +32,17 @@ pub enum TokenType {
     AND,
     CLASS,
     ELSE,
-    // FALSE,
+    FALSE,
     FUNC,
     FOR,
     IF,
-    // NIL,
+    NIL,
     OR,
     PRINT,
     RETURN,
     // SUPER,
     // THIS,
-    // TRUE,
+    TRUE,
     HAVE,
     VAR,
     WHILE,
