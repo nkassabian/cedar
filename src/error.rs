@@ -47,6 +47,7 @@ impl KayLanError {
         //     &line[find_nth_index(&line, '\n', self.line - 1).unwrap() + 1
         //         ..find_nth_index(&line, '\n', self.line).unwrap()]
         // );
+        //
 
         if self.line < 10 {
             println!(
