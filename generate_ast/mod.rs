@@ -29,6 +29,7 @@ fn define_ast(output_dir: &String, base_name: &String, types: &[String]) -> io::
 
     write!(file, "{}", "use crate::error::*;\n")?;
     write!(file, "{}", "use crate::token::*;\n")?;
+    write!(file, "{}", "use crate::object::*;\n")?;
 
     for ttype in types {
         let (base_class_name, args) = ttype.split_once(":").unwrap();
@@ -53,7 +54,7 @@ fn define_ast(output_dir: &String, base_name: &String, types: &[String]) -> io::
     write!(file, "}}\n\n")?;
 
     write!(file, "impl {} {{\n", base_name)?;
-    write!(file, "    pub fn accept<T>(&self, {}_visitor: &dyn {base_name}Visitor<T>) -> Result<T, CDLexerError> {{\n", base_name.to_lowercase())?;
+    write!(file, "    pub fn accept<T>(&self, {}_visitor: &dyn {base_name}Visitor<T>) -> Result<T, CDSyntaxError> {{\n", base_name.to_lowercase())?;
     write!(file, "        match self {{\n")?;
     for t in &tree_types {
         write!(
@@ -80,7 +81,7 @@ fn define_ast(output_dir: &String, base_name: &String, types: &[String]) -> io::
     for t in &tree_types {
         write!(
             file,
-            "    fn visit_{}_{}(&self, expr: &{}) -> Result<T, CDLexerError>;\n",
+            "    fn visit_{}_{}(&self, expr: &{}) -> Result<T, CDSyntaxError>;\n",
             t.base_class_name.to_lowercase(),
             base_name.to_lowercase(),
             t.class_name
@@ -92,7 +93,7 @@ fn define_ast(output_dir: &String, base_name: &String, types: &[String]) -> io::
         write!(file, "impl {} {{\n", t.class_name)?;
         write!(
             file,
-            "    pub fn accept<T>(&self, visitor: &dyn {}Visitor<T>) -> Result<T, CDLexerError> {{\n",
+            "    pub fn accept<T>(&self, visitor: &dyn {}Visitor<T>) -> Result<T, CDSyntaxError> {{\n",
             base_name
         )?;
         write!(

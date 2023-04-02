@@ -1,7 +1,7 @@
 use crate::error::CDLexerError;
+use crate::object::*;
 use crate::token::*;
 use crate::token_type::*;
-
 pub struct Scanner {
     source: Vec<char>,
     tokens: Vec<Token>,

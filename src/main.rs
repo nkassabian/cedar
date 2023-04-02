@@ -1,8 +1,10 @@
 mod ast_printer;
 mod error;
 mod expr;
+mod interpreter;
 mod token;
 use error::*;
+mod object;
 mod parser;
 mod scanner;
 mod token_type;
