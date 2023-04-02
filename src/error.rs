@@ -1,7 +1,7 @@
 use ansi_term::Colour::{Black, Blue, Purple, Red, Yellow};
 
 #[derive(Debug)]
-pub struct KayLanError {
+pub struct CDLexerError {
     line: usize,
     message: String,
     column: usize,
@@ -10,7 +10,7 @@ pub struct KayLanError {
     source_toks: Vec<char>,
 }
 
-impl KayLanError {
+impl CDLexerError {
     pub fn error(
         line: usize,
         column: usize,
@@ -18,8 +18,8 @@ impl KayLanError {
         message: String,
         file_name: String,
         source_toks: Vec<char>,
-    ) -> KayLanError {
-        KayLanError {
+    ) -> CDLexerError {
+        CDLexerError {
             line,
             message,
             column,
@@ -42,18 +42,18 @@ impl KayLanError {
         }
 
         let mut error_line: String = " ".to_string();
-
+        println!("{}", self.line + 1);
         if self.line < 10 {
             error_line = format!(
-                "{}\n{}\n{}\n{}\n",
-                format!("{}", get_line(self.line, &line, -1)),
-                format!("{}", get_line(self.line, &line, 0)),
+                "    {}\n    {}\n    {}\n    {}\n",
+                format!("{}", get_line(self.line + 1, &line, -1)),
+                format!("{}", get_line(self.line + 1, &line, 0)),
                 format!(
                     "{}",
                     Red.bold()
                         .paint(create_string_with_spaces(self.column + 2, '^'))
                 ),
-                format!("{}", get_line(self.line, &line, 1))
+                format!("{}", get_line(self.line + 1, &line, 1))
             )
         }
 
@@ -69,6 +69,43 @@ impl KayLanError {
             error_line
         );
         std::process::exit(64);
+    }
+}
+
+#[derive(Clone)]
+pub enum CDSyntaxErrorTypes {
+    UNEXPECTED_EOF,
+    ENEXPECTED_TOKEN,
+}
+
+#[derive(Clone)]
+pub struct CDSyntaxError {
+    line: usize,
+    column: usize,
+    main_message: String,
+    message: String,
+    ErrorType: CDSyntaxErrorTypes,
+}
+
+impl CDSyntaxError {
+    pub fn error(
+        ErrorType: CDSyntaxErrorTypes,
+        line: usize,
+        column: usize,
+        main_message: String,
+        message: String,
+    ) -> CDSyntaxError {
+        CDSyntaxError {
+            ErrorType,
+            line,
+            message,
+            column,
+            main_message,
+        }
+    }
+
+    pub fn report(self) {
+        eprint!("{}: {}!", self.main_message, self.message);
     }
 }
 

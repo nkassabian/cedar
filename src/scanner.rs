@@ -1,4 +1,4 @@
-use crate::error::KayLanError;
+use crate::error::CDLexerError;
 use crate::token::*;
 use crate::token_type::*;
 
@@ -25,14 +25,14 @@ impl Scanner {
         };
     }
 
-    ///scans the source code and generates a vector of tokens. It
+    /// Scans the source code and generates a vector of tokens. It
     /// keeps calling the scan_token function until the end of the
     /// source code is reached. If an error is encountered while
     /// scanning a token, it is reported and the function stops scanning.
     /// At the end, an EOF token is added to the token vector, and the
     /// function returns a reference to the vector of tokens, wrapped
-    /// in a Result indicating success or an error of type KayLanError.
-    pub fn scan_tokens(&mut self) -> Result<&Vec<Token>, KayLanError> {
+    /// in a Result indicating success or an error of type CDLexerError.
+    pub fn scan_tokens(&mut self) -> Result<&Vec<Token>, CDLexerError> {
         while !self.is_eof() {
             match self.scan_token() {
                 Ok(_) => {}
@@ -53,7 +53,7 @@ impl Scanner {
         Ok(&self.tokens)
     }
 
-    ///returns a boolean indicating whether the parser has reached
+    /// Returns a boolean indicating whether the parser has reached
     /// the end of the source code being parsed. If the current
     /// position of the parser is greater than or equal to the length
     ///  of the source code, it is considered to have reached the end
@@ -73,7 +73,7 @@ impl Scanner {
         }
     }
 
-    ///Increments the current position 1, resets the character offset,
+    /// Increments the current position 1, resets the character offset,
     /// and increments the line number by 1. This effectively moves
     /// the scanner to the start of the next line in the source code.
     fn next_line(&mut self) {
@@ -117,7 +117,7 @@ impl Scanner {
         }
     }
 
-    ///This function adds a conditional token to the token list based
+    /// This function adds a conditional token to the token list based
     /// on whether the next character is equal to the given comparison
     /// character. If it is, a token of type_true is added, otherwise
     /// a token of type_false is added. If there are no more characters
@@ -177,7 +177,7 @@ impl Scanner {
         }
     }
 
-    ///Increments the current position and offset of the scanner by 1,
+    /// Increments the current position and offset of the scanner by 1,
     /// effectively advancing to the next character without doing
     /// anything else. It is typically used to skip over whitespace or
     /// other non-significant characters.
@@ -192,7 +192,7 @@ impl Scanner {
     /// If the end of the input is reached before the end of the string
     /// is found, it returns a Lexer Error. If the string is successfully
     /// parsed, a string token is added to the tokenizer state.
-    fn string(&mut self) -> Result<(), KayLanError> {
+    fn string(&mut self) -> Result<(), CDLexerError> {
         self.next();
         while !self.peek('"') && !self.is_eof() {
             self.next();
@@ -201,7 +201,7 @@ impl Scanner {
             }
         }
         if self.is_eof() {
-            return Err(KayLanError::error(
+            return Err(CDLexerError::error(
                 self.line,
                 self.offset,
                 "Lexer Error".to_string(),
@@ -242,7 +242,7 @@ impl Scanner {
     /// is successfully parsed, a number token is added to the tokenizer
     /// state with the appropriate object type (Num) and token type (NUMBER).
     /// If an invalid number is encountered, it returns a Lexer Error.
-    fn number(&mut self) -> Result<(), KayLanError> {
+    fn number(&mut self) -> Result<(), CDLexerError> {
         while {
             let next = self.peak_next();
             self.is_digit(next)
@@ -263,7 +263,7 @@ impl Scanner {
                     self.next();
                 }
             } else {
-                return Err(KayLanError::error(
+                return Err(CDLexerError::error(
                     self.line,
                     self.offset,
                     "Lexer Error".to_string(),
@@ -282,7 +282,7 @@ impl Scanner {
         let number = match value.parse::<f64>() {
             Ok(num) => num,
             Err(_) => {
-                return Err(KayLanError::error(
+                return Err(CDLexerError::error(
                     self.line,
                     self.offset,
                     "Lexer Error".to_string(),
@@ -306,8 +306,8 @@ impl Scanner {
         return char >= '0' && char <= '9';
     }
 
-    // This function checks if a character is an alphabetic character,
-    ///underscore (_), vertical bar (|), or ampersand (&), and returns
+    /// This function checks if a character is an alphabetic character,
+    /// underscore (_), vertical bar (|), or ampersand (&), and returns
     /// a boolean value accordingly.
     fn is_alpha(&mut self, c: char) -> bool {
         return (c >= 'a' && c <= 'z')
@@ -354,7 +354,7 @@ impl Scanner {
         );
     }
 
-    fn scan_token(&mut self) -> Result<(), KayLanError> {
+    fn scan_token(&mut self) -> Result<(), CDLexerError> {
         while !self.is_eof() {
             let c = self.at();
             self.current = self.position;
@@ -384,7 +384,7 @@ impl Scanner {
                     } else if self.is_alpha(c) {
                         self.identifier();
                     } else {
-                        return Err(KayLanError::error(
+                        return Err(CDLexerError::error(
                             self.line,
                             self.offset,
                             "Lexer Error".to_string(),

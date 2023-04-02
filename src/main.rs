@@ -1,15 +1,20 @@
+mod ast_printer;
 mod error;
 mod expr;
 mod token;
 use error::*;
+mod parser;
 mod scanner;
 mod token_type;
 
 // mod expr;
 
+use parser::Parser;
 use scanner::*;
 use std::env::args;
 use std::io::{self, stdout, BufRead, Write};
+
+use crate::ast_printer::AstPrinter;
 
 fn main() {
     let args: Vec<String> = args().collect();
@@ -52,13 +57,16 @@ fn run_prompt() {
     }
 }
 
-fn run(source: String, file_name: String) -> Result<(), KayLanError> {
+fn run(source: String, file_name: String) -> Result<(), CDLexerError> {
     let mut scanner = Scanner::new(source.chars().collect(), file_name);
     let tokens = scanner.scan_tokens();
 
-    for token in tokens? {
-        println!("{:?}", token);
-    }
+    // for token in tokens? {
+    //     println!("{:?}", token);
+    // }
+
+    let mut parser = Parser::new(tokens.unwrap().clone());
+    parser.parse();
 
     Ok(())
 }
