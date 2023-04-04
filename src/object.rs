@@ -1,5 +1,6 @@
 use core::fmt;
 use std::{
+    cmp::Ordering,
     fmt::format,
     ops::{Add, Div, Mul, Sub},
 };
@@ -80,3 +81,23 @@ impl Add for Object {
         }
     }
 }
+
+impl PartialOrd for Object {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        match (self, other) {
+            (Object::Num(left), Object::Num(right)) => left.partial_cmp(right),
+            _ => None,
+        }
+    }
+}
+
+impl Ord for Object {
+    fn cmp(&self, other: &Self) -> Ordering {
+        match (self, other) {
+            (Object::Num(left), Object::Num(right)) => left.partial_cmp(right).unwrap(),
+            _ => Ordering::Equal,
+        }
+    }
+}
+
+impl Eq for Object {}

@@ -57,7 +57,13 @@ impl ExprVisitor<Object> for Interpreter {
             TokenType::SLASH => left / right,
             TokenType::STAR => left * right,
             TokenType::PLUS => left + right,
-            TokenType::GREATER => left > right,
+            TokenType::GREATER => Object::Bool(left > right),
+            TokenType::LESS => Object::Bool(left < right),
+            TokenType::GREATEREQUAL => Object::Bool(left >= right),
+            TokenType::LESSEQUAL => Object::Bool(left <= right),
+            TokenType::EQUALEQUAL => Object::Bool(left == right),
+            TokenType::BANGEQUAL => Object::Bool(left != right),
+
             _ => Object::ArithmeticError,
         };
         if result == Object::ArithmeticError {
