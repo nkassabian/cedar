@@ -28,16 +28,20 @@ impl ExprVisitor<Object> for Interpreter {
                     Ok(Object::Bool(true))
                 }
             }
-            TokenType::MINUS => match right {
-                Object::Num(num) => Ok(Object::Num(-num)),
-                _ => Err(CDSyntaxError::error(
-                    CDSyntaxErrorTypes::ENEXPECTED_TOKEN,
-                    0,
-                    0,
-                    "Syntax Error".to_string(),
-                    "Operand must be a number.".to_string(),
-                )),
-            },
+            TokenType::MINUS => {
+                Interpreter::checkNumberOperand(expr.operator.clone(), &right)?;
+
+                match right {
+                    Object::Num(num) => Ok(Object::Num(-num)),
+                    _ => Err(CDSyntaxError::error(
+                        CDSyntaxErrorTypes::ENEXPECTED_TOKEN,
+                        0,
+                        0,
+                        "Syntax Error".to_string(),
+                        "Operand must be a number.".to_string(),
+                    )),
+                }
+            }
             _ => Err(CDSyntaxError::error(
                 CDSyntaxErrorTypes::ENEXPECTED_TOKEN,
                 0,
@@ -51,7 +55,8 @@ impl ExprVisitor<Object> for Interpreter {
     fn visit_binary_expr(&self, expr: &BinaryExpr) -> Result<Object, CDSyntaxError> {
         let left = self.evaluate(&expr.left)?;
         let right = self.evaluate(&expr.right)?;
-
+        // TODO: Add String support for both expressions
+        //Interpreter::check_number_operands(&expr.operator, &left, &right);
         let result = match expr.operator.ttype {
             TokenType::MINUS => left - right,
             TokenType::SLASH => left / right,
@@ -94,7 +99,30 @@ impl Interpreter {
                 println!("{}", v);
                 true
             }
-            Err(e) => false,
+            Err(e) => {
+                e.report();
+                false
+            }
+        }
+    }
+    pub fn checkNumberOperand(operator: Token, operand: &Object) -> Result<(), CDSyntaxError> {
+        if let Object::Num(_) = operand {
+            Ok(())
+        } else {
+            println!("{}", "Error");
+            Ok(CDSyntaxError::runtime_error())
+        }
+    }
+
+    fn check_number_operands(
+        operator: &Token,
+        left: &Object,
+        right: &Object,
+    ) -> Result<(), CDSyntaxError> {
+        if let (Object::Num(_), Object::Num(_)) = (left, right) {
+            Ok(())
+        } else {
+            Ok(CDSyntaxError::runtime_error())
         }
     }
 }

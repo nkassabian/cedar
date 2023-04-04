@@ -1,5 +1,7 @@
 use ansi_term::Colour::{Black, Blue, Purple, Red, Yellow};
 
+use crate::token::Token;
+
 #[derive(Debug)]
 pub struct CDLexerError {
     line: usize,
@@ -105,7 +107,20 @@ impl CDSyntaxError {
     }
 
     pub fn report(self) {
-        eprint!("{}: {}!", self.main_message, self.message);
+        eprintln!("{}: {}!", self.main_message, self.message);
+        std::process::exit(64);
+    }
+
+    // TODO: Make dynamic
+    pub fn runtime_error() {
+        let err = CDSyntaxError::error(
+            CDSyntaxErrorTypes::ENEXPECTED_TOKEN,
+            0,
+            0,
+            "Syntax Error".to_string(),
+            "Operand must be a number.".to_string(),
+        );
+        err.report();
     }
 }
 

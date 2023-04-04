@@ -12,6 +12,7 @@ pub enum Object {
     Str(String),
     Bool(bool),
     Nil,
+    // TODO: Update arithmatic error
     ArithmeticError,
 }
 
@@ -48,6 +49,15 @@ impl Div for Object {
     type Output = Object;
 
     fn div(self, other: Self) -> Object {
+        match other {
+            Object::Num(other) => {
+                if other == 0.0 {
+                    return Object::ArithmeticError;
+                }
+            }
+            _ => (),
+        }
+
         match (self, other) {
             (Object::Num(left), Object::Num(right)) => Object::Num(left / right),
             _ => Object::ArithmeticError,
@@ -71,11 +81,15 @@ impl Add for Object {
 
     fn add(self, other: Self) -> Object {
         println!("{}, {}", self, other);
+
         match (self, other) {
-            (Object::Str(left), Object::Str(right)) => {
-                println!("Got string");
-                Object::Str(format!("{}{}", left, right))
+            (Object::Str(left), Object::Num(right)) => {
+                Object::Str(format!("{}{}", left, right.to_string()))
             }
+            (Object::Num(left), Object::Str(right)) => {
+                Object::Str(format!("{}{}", left.to_string(), right))
+            }
+            (Object::Str(left), Object::Str(right)) => Object::Str(format!("{}{}", left, right)),
             (Object::Num(left), Object::Num(right)) => Object::Num(left + right),
             _ => Object::ArithmeticError,
         }
