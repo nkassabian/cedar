@@ -162,12 +162,12 @@ impl Parser {
     fn primary(&mut self) -> Result<Expr, CDSyntaxError> {
         if self.is_match(&[TokenType::FALSE]) {
             return Ok(Expr::Literal(LiteralExpr {
-                value: Some(Object::False),
+                value: Some(Object::Bool(false)),
             }));
         }
         if self.is_match(&[TokenType::TRUE]) {
             return Ok(Expr::Literal(LiteralExpr {
-                value: Some(Object::False),
+                value: Some(Object::Bool(false)),
             }));
         }
         if self.is_match(&[TokenType::NIL]) {

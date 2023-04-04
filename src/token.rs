@@ -46,8 +46,14 @@ impl fmt::Display for Token {
                 Object::Num(x) => x.to_string(),
                 Object::Str(x) => format!("\"{}\"", x),
                 Object::Nil => "Nil".to_string(),
-                Object::True => "True".to_string(),
-                Object::False => "False".to_string(),
+                Object::Bool(x) => {
+                    if *x == true {
+                        "True".to_string()
+                    } else {
+                        "False".to_string()
+                    }
+                }
+                Object::ArithmeticError => todo!(),
             },
             self.line,
             self.position

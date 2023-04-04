@@ -192,6 +192,7 @@ impl Scanner {
     /// If the end of the input is reached before the end of the string
     /// is found, it returns a Lexer Error. If the string is successfully
     /// parsed, a string token is added to the tokenizer state.
+    // TODO: Add check for new line
     fn string(&mut self) -> Result<(), CDLexerError> {
         self.next();
         while !self.peek('"') && !self.is_eof() {
@@ -214,10 +215,10 @@ impl Scanner {
         self.next();
         self.next();
 
-        let value = self.source[self.current + 1..self.position - 1]
+        let value: String = self.source[self.current + 1..self.position - 1]
             .iter()
             .collect();
-        self.add_string_token(Object::Nil, TokenType::STRING, value);
+        self.add_string_token(Object::Str(value.clone()), TokenType::STRING, value);
         Ok(())
     }
 

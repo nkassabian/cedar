@@ -72,13 +72,13 @@ impl CDLexerError {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum CDSyntaxErrorTypes {
     UNEXPECTED_EOF,
     ENEXPECTED_TOKEN,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct CDSyntaxError {
     line: usize,
     column: usize,
