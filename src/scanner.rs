@@ -1,7 +1,7 @@
 use crate::error::CDLexerError;
+use crate::object::*;
 use crate::token::*;
 use crate::token_type::*;
-
 pub struct Scanner {
     source: Vec<char>,
     tokens: Vec<Token>,
@@ -192,6 +192,7 @@ impl Scanner {
     /// If the end of the input is reached before the end of the string
     /// is found, it returns a Lexer Error. If the string is successfully
     /// parsed, a string token is added to the tokenizer state.
+    // TODO: Add check for new line
     fn string(&mut self) -> Result<(), CDLexerError> {
         self.next();
         while !self.peek('"') && !self.is_eof() {
@@ -214,10 +215,10 @@ impl Scanner {
         self.next();
         self.next();
 
-        let value = self.source[self.current + 1..self.position - 1]
+        let value: String = self.source[self.current + 1..self.position - 1]
             .iter()
             .collect();
-        self.add_string_token(Object::Nil, TokenType::STRING, value);
+        self.add_string_token(Object::Str(value.clone()), TokenType::STRING, value);
         Ok(())
     }
 
@@ -347,8 +348,21 @@ impl Scanner {
             .cloned()
             .unwrap_or(TokenType::IDENTIFIER);
 
+        // TODO: CLEAN bool value
+        let mut bool_value = None;
+        if text == "false" {
+            bool_value = Some(false);
+        } else if text == "true" {
+            bool_value = Some(true);
+        }
+
+        let object = match bool_value {
+            Some(bool_value) => Object::Bool(bool_value),
+            None => Object::Str(text.to_string()),
+        };
+
         self.add_string_token(
-            Object::Nil,
+            object,
             ttype,
             self.source[self.current..self.position].iter().collect(),
         );

@@ -1,28 +1,8 @@
-use once_cell::sync::Lazy;
-
+use crate::object::*;
 use crate::token_type::*;
 use core::fmt;
+use once_cell::sync::Lazy;
 use std::collections::HashMap;
-#[derive(Debug, Clone)]
-pub enum Object {
-    Num(f64),
-    Str(String),
-    Nil,
-    True,
-    False,
-}
-
-impl fmt::Display for Object {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Object::Num(x) => write!(f, "{x}"),
-            Object::Str(x) => write!(f, "\"{x}\""),
-            Object::Nil => write!(f, "Nil"),
-            Object::True => write!(f, "True"),
-            Object::False => write!(f, "False"),
-        }
-    }
-}
 
 #[derive(Debug, Clone)]
 pub struct Token {
@@ -66,8 +46,14 @@ impl fmt::Display for Token {
                 Object::Num(x) => x.to_string(),
                 Object::Str(x) => format!("\"{}\"", x),
                 Object::Nil => "Nil".to_string(),
-                Object::True => "True".to_string(),
-                Object::False => "False".to_string(),
+                Object::Bool(x) => {
+                    if *x == true {
+                        "True".to_string()
+                    } else {
+                        "False".to_string()
+                    }
+                }
+                Object::ArithmeticError => todo!(),
             },
             self.line,
             self.position

@@ -1,10 +1,12 @@
 use crate::error::*;
 use crate::expr::*;
-use crate::token::*;
+use crate::object::*;
+use crate::stmt::ExpressionStmt;
+use crate::stmt::PrintStmt;
+use crate::stmt::Stmt;
+use crate::stmt::VarStmt;
 use crate::token::*;
 use crate::token_type::*;
-use crate::token_type::*;
-
 pub struct Parser {
     tokens: Vec<Token>,
     current: usize,
@@ -15,17 +17,14 @@ impl Parser {
         Parser { tokens, current: 0 }
     }
 
-    pub fn parse(&mut self) -> Result<Expr, CDSyntaxError> {
-        match self.expression() {
-            Ok(expr) => Ok(expr),
-            Err(e) => {
-                let err = e.clone();
-                err.report();
-                Err(e)
-            }
+    pub fn parse(&mut self) -> Result<Vec<Stmt>, CDSyntaxError> {
+        let mut statements: Vec<Stmt> = Vec::new();
+        while !self.is_at_end() {
+            statements.push(self.decleration()?);
         }
+        return Ok(statements);
     }
-    pub fn syncronize(&mut self) {
+    pub fn synchronize(&mut self) {
         self.advance();
 
         while !self.is_at_end() {
@@ -162,16 +161,18 @@ impl Parser {
     }
 
     fn primary(&mut self) -> Result<Expr, CDSyntaxError> {
-        if self.is_match(&[TokenType::FALSE]) {
-            return Ok(Expr::Literal(LiteralExpr {
-                value: Some(Object::False),
-            }));
-        }
         if self.is_match(&[TokenType::TRUE]) {
             return Ok(Expr::Literal(LiteralExpr {
-                value: Some(Object::False),
+                value: Some(Object::Bool(true)),
             }));
         }
+
+        if self.is_match(&[TokenType::FALSE]) {
+            return Ok(Expr::Literal(LiteralExpr {
+                value: Some(Object::Bool(false)),
+            }));
+        }
+
         if self.is_match(&[TokenType::NIL]) {
             return Ok(Expr::Literal(LiteralExpr {
                 value: Some(Object::Nil),
@@ -184,6 +185,11 @@ impl Parser {
             }));
         }
 
+        if self.is_match(&[TokenType::IDENTIFIER]) {
+            return Ok(Expr::Variable(VariableExpr {
+                name: self.previous(),
+            }));
+        }
         if self.is_match(&[TokenType::LEFTPAREN]) {
             let expr = self.expression()?;
             self.consume(
@@ -192,6 +198,18 @@ impl Parser {
             )?;
             return Ok(Expr::Grouping(GroupingExpr {
                 expression: Box::new(expr),
+            }));
+        }
+
+        if self.is_match(&[TokenType::PRINT]) {
+            return Ok(Expr::Variable(VariableExpr {
+                name: self.previous().clone(),
+            }));
+        }
+
+        if self.is_match(&[TokenType::IDENTIFIER]) {
+            return Ok(Expr::Variable(VariableExpr {
+                name: self.previous(),
             }));
         }
 
@@ -255,5 +273,69 @@ impl Parser {
 
     fn previous(&self) -> Token {
         self.tokens.get(self.current - 1).unwrap().clone()
+    }
+
+    /*
+    ==============================
+            STATEMENTS
+    ==============================
+     */
+
+    fn statement(&mut self) -> Result<Stmt, CDSyntaxError> {
+        if self.is_match(&[TokenType::PRINT]) {
+            return self.print_statement();
+        }
+        self.expression_statement()
+    }
+
+    fn decleration(&mut self) -> Result<Stmt, CDSyntaxError> {
+        if self.is_match(&[TokenType::VAR]) {
+            self.var_declaration()
+        } else {
+            self.statement()
+        }
+        .or_else(|_| {
+            self.synchronize();
+            Err(CDSyntaxError::error(
+                CDSyntaxErrorTypes::ENEXPECTED_TOKEN,
+                0,
+                0,
+                "Syntax Error".to_string(),
+                "Error in decleration".to_string(),
+            ))
+        })
+    }
+
+    fn var_declaration(&mut self) -> Result<Stmt, CDSyntaxError> {
+        let name: Token = self
+            .consume(TokenType::IDENTIFIER, "Expected variable name".to_string())
+            .unwrap();
+
+        let initializer = match self.is_match(&[TokenType::EQUAL]) {
+            true => Some(self.expression()?),
+            false => None,
+        };
+
+        self.consume(
+            TokenType::SEMICOLON,
+            "Expected ';' after variable decleration".to_string(),
+        )?;
+
+        return Ok(Stmt::Var(VarStmt {
+            name: name,
+            initializer,
+        }));
+    }
+
+    fn print_statement(&mut self) -> Result<Stmt, CDSyntaxError> {
+        let value = self.expression()?;
+        self.consume(TokenType::SEMICOLON, "Expect ';' after value.".to_string())?;
+        Ok(Stmt::Print(PrintStmt { expression: value }))
+    }
+
+    fn expression_statement(&mut self) -> Result<Stmt, CDSyntaxError> {
+        let expr = self.expression()?;
+        self.consume(TokenType::SEMICOLON, "Expect ';' after value.".to_string())?;
+        Ok(Stmt::Expression(ExpressionStmt { expression: expr }))
     }
 }

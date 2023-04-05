@@ -1,5 +1,7 @@
 use ansi_term::Colour::{Black, Blue, Purple, Red, Yellow};
 
+use crate::token::Token;
+
 #[derive(Debug)]
 pub struct CDLexerError {
     line: usize,
@@ -42,7 +44,6 @@ impl CDLexerError {
         }
 
         let mut error_line: String = " ".to_string();
-        println!("{}", self.line + 1);
         if self.line < 10 {
             error_line = format!(
                 "    {}\n    {}\n    {}\n    {}\n",
@@ -72,13 +73,13 @@ impl CDLexerError {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum CDSyntaxErrorTypes {
     UNEXPECTED_EOF,
     ENEXPECTED_TOKEN,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct CDSyntaxError {
     line: usize,
     column: usize,
@@ -105,7 +106,20 @@ impl CDSyntaxError {
     }
 
     pub fn report(self) {
-        eprint!("{}: {}!", self.main_message, self.message);
+        eprintln!("{}: {}!", self.main_message, self.message);
+        std::process::exit(64);
+    }
+
+    // TODO: Make dynamic
+    pub fn runtime_error() {
+        let err = CDSyntaxError::error(
+            CDSyntaxErrorTypes::ENEXPECTED_TOKEN,
+            0,
+            0,
+            "Syntax Error".to_string(),
+            "Operand must be a number.".to_string(),
+        );
+        err.report();
     }
 }
 
