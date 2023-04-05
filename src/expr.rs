@@ -1,7 +1,6 @@
 use crate::error::*;
-use crate::object::*;
 use crate::token::*;
-#[derive(Debug)]
+use crate::object::*;
 
 pub enum Expr {
     Binary(BinaryExpr),
@@ -22,30 +21,25 @@ impl Expr {
         }
     }
 }
-#[derive(Debug)]
 
 pub struct BinaryExpr {
     pub left: Box<Expr>,
     pub operator: Token,
     pub right: Box<Expr>,
 }
-#[derive(Debug)]
 
 pub struct GroupingExpr {
     pub expression: Box<Expr>,
 }
 
-#[derive(Debug)]
 pub struct LiteralExpr {
     pub value: Option<Object>,
 }
-#[derive(Debug)]
 
 pub struct UnaryExpr {
     pub operator: Token,
     pub right: Box<Expr>,
 }
-#[derive(Debug)]
 
 pub struct VariableExpr {
     pub name: Token,
@@ -88,3 +82,4 @@ impl VariableExpr {
         visitor.visit_variable_expr(self)
     }
 }
+
