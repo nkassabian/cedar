@@ -348,8 +348,21 @@ impl Scanner {
             .cloned()
             .unwrap_or(TokenType::IDENTIFIER);
 
+        // TODO: CLEAN bool value
+        let mut bool_value = None;
+        if text == "false" {
+            bool_value = Some(false);
+        } else if text == "true" {
+            bool_value = Some(true);
+        }
+
+        let object = match bool_value {
+            Some(bool_value) => Object::Bool(bool_value),
+            None => Object::Str(text.to_string()),
+        };
+
         self.add_string_token(
-            Object::Str(text),
+            object,
             ttype,
             self.source[self.current..self.position].iter().collect(),
         );

@@ -112,7 +112,7 @@ impl StmtVisitor<()> for Interpreter {
 
 impl Interpreter {
     fn evaluate(&self, expr: &Expr) -> Result<Object, CDSyntaxError> {
-        return expr.accept(self);
+        Ok(expr.accept(self)?)
     }
 
     fn is_truthy(&self, object: &Object) -> bool {
@@ -124,8 +124,8 @@ impl Interpreter {
         }
     }
 
-    pub fn execute(&mut self, stmt: &Stmt) -> () {
-        stmt.accept(self);
+    pub fn execute(&mut self, stmt: &Stmt) -> Result<(), CDSyntaxError> {
+        Ok(stmt.accept(self)?)
     }
     pub fn checkNumberOperand(operator: Token, operand: &Object) -> Result<(), CDSyntaxError> {
         if let Object::Num(_) = operand {

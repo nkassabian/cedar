@@ -6,7 +6,6 @@ use crate::token::*;
 pub enum Stmt {
     Expression(ExpressionStmt),
     Print(PrintStmt),
-    Var(VarStmt),
 }
 
 impl Stmt {
@@ -14,7 +13,6 @@ impl Stmt {
         match self {
             Stmt::Expression(v) => v.accept(stmt_visitor),
             Stmt::Print(v) => v.accept(stmt_visitor),
-            Stmt::Var(v) => v.accept(stmt_visitor),
         }
     }
 }
@@ -50,11 +48,5 @@ impl ExpressionStmt {
 impl PrintStmt {
     pub fn accept<T>(&self, visitor: &dyn StmtVisitor<T>) -> Result<T, CDSyntaxError> {
         visitor.visit_print_stmt(self)
-    }
-}
-
-impl VarStmt {
-    pub fn accept<T>(&self, visitor: &dyn StmtVisitor<T>) -> Result<T, CDSyntaxError> {
-        visitor.visit_var_stmt(self)
     }
 }
