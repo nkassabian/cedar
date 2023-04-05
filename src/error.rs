@@ -44,7 +44,6 @@ impl CDLexerError {
         }
 
         let mut error_line: String = " ".to_string();
-        println!("{}", self.line + 1);
         if self.line < 10 {
             error_line = format!(
                 "    {}\n    {}\n    {}\n    {}\n",

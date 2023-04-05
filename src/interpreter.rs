@@ -1,11 +1,8 @@
-use std::os::raw::c_void;
-
 use crate::error::*;
 use crate::expr::*;
 
 use crate::object::*;
 
-use crate::stmt;
 use crate::stmt::ExpressionStmt;
 use crate::stmt::PrintStmt;
 use crate::stmt::Stmt;
@@ -104,7 +101,7 @@ impl StmtVisitor<()> for Interpreter {
     }
 
     fn visit_print_stmt(&self, expr: &PrintStmt) -> Result<(), CDSyntaxError> {
-        self.evaluate(&expr.expression)?;
+        println!("{}", self.evaluate(&expr.expression)?.to_string());
         Ok(())
     }
 
@@ -121,20 +118,19 @@ impl Interpreter {
     fn is_truthy(&self, object: &Object) -> bool {
         !matches!(object, Object::Nil | Object::Bool(false))
     }
-    pub fn interpret(&mut self, statements: &Vec<Stmt>) {
+    pub fn interpret(&mut self, statements: &[Stmt]) {
         for statement in statements {
             self.execute(&statement);
         }
     }
 
     pub fn execute(&mut self, stmt: &Stmt) -> () {
-        stmt.accept(self).unwrap();
+        stmt.accept(self);
     }
     pub fn checkNumberOperand(operator: Token, operand: &Object) -> Result<(), CDSyntaxError> {
         if let Object::Num(_) = operand {
             Ok(())
         } else {
-            println!("{}", "Error");
             Ok(CDSyntaxError::runtime_error())
         }
     }

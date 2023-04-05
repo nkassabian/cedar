@@ -16,7 +16,6 @@ use parser::Parser;
 use scanner::*;
 use std::env::args;
 use std::io::{self, stdout, BufRead, Write};
-use stmt::Stmt;
 
 struct Cedar {
     interpreter: Interpreter,

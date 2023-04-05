@@ -21,7 +21,6 @@ impl Parser {
         while !self.is_at_end() {
             statements.push(self.statement()?);
         }
-        println!("{:?}", statements);
         return Ok(statements);
     }
     pub fn syncronize(&mut self) {
@@ -245,7 +244,6 @@ impl Parser {
         if self.is_at_end() {
             false
         } else {
-            //println!("{} {}", self.peek().ttype == ttype, self.current);
             self.peek().ttype == ttype
         }
     }
@@ -276,22 +274,16 @@ impl Parser {
      */
 
     fn statement(&mut self) -> Result<Stmt, CDSyntaxError> {
-        if self.tokens.get(self.current).unwrap().ttype == TokenType::PRINT {
+        if self.is_match(&[TokenType::PRINT]) {
             return self.print_statement();
         }
         self.expression_statement()
     }
 
     fn print_statement(&mut self) -> Result<Stmt, CDSyntaxError> {
-        let value: Expr = self.expression()?;
-        println!("{}", self.tokens.get(self.current).unwrap());
-        self.current += 1;
-        self.consume(
-            TokenType::SEMICOLON,
-            "Expected ';' after value.".to_string(),
-        )?;
-
-        return Ok(Stmt::Print(PrintStmt { expression: value }));
+        let value = self.expression()?;
+        self.consume(TokenType::SEMICOLON, "Expect ';' after value.".to_string())?;
+        Ok(Stmt::Print(PrintStmt { expression: value }))
     }
 
     fn expression_statement(&mut self) -> Result<Stmt, CDSyntaxError> {

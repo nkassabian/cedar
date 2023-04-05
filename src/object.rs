@@ -80,8 +80,6 @@ impl Add for Object {
     type Output = Object;
 
     fn add(self, other: Self) -> Object {
-        println!("{}, {}", self, other);
-
         match (self, other) {
             (Object::Str(left), Object::Num(right)) => {
                 Object::Str(format!("{}{}", left, right.to_string()))
