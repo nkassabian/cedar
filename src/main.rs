@@ -2,6 +2,7 @@ mod ast_printer;
 mod error;
 mod expr;
 mod interpreter;
+mod stmt;
 mod token;
 use error::*;
 mod object;
@@ -15,6 +16,7 @@ use parser::Parser;
 use scanner::*;
 use std::env::args;
 use std::io::{self, stdout, BufRead, Write};
+use stmt::Stmt;
 
 struct Cedar {
     interpreter: Interpreter,
@@ -27,7 +29,7 @@ impl Cedar {
         }
     }
 
-    fn run_file(&self, path: &str) -> io::Result<()> {
+    fn run_file(&mut self, path: &str) -> io::Result<()> {
         let buf = std::fs::read_to_string(path)?;
         if self.run(buf, path.to_string()).is_err() {
             // Ignore: error was already reported
@@ -37,7 +39,7 @@ impl Cedar {
         Ok(())
     }
 
-    fn run_prompt(&self) {
+    fn run_prompt(&mut self) {
         let stdin = io::stdin();
         print!("> ");
         let _ = stdout().flush();
@@ -55,7 +57,7 @@ impl Cedar {
         }
     }
 
-    fn run(&self, source: String, file_name: String) -> Result<(), CDLexerError> {
+    fn run(&mut self, source: String, file_name: String) -> Result<(), CDLexerError> {
         let mut scanner = Scanner::new(source.chars().collect(), file_name);
         let tokens = scanner.scan_tokens();
 
@@ -64,9 +66,10 @@ impl Cedar {
         // }
 
         let mut parser = Parser::new(tokens.unwrap().clone());
+        //let mut statements: Vec<Stmt> = parser.parse().unwrap();
         match parser.parse() {
-            Ok(expr) => {
-                self.interpreter.interpret(&expr);
+            Ok(statements) => {
+                self.interpreter.interpret(&statements);
             }
             Err(error) => {
                 eprint!("{:?}", error);
@@ -78,7 +81,7 @@ impl Cedar {
 
 fn main() {
     let args: Vec<String> = args().collect();
-    let cedar = Cedar::new();
+    let mut cedar = Cedar::new();
     //println!("{}", args[1]);
     match args.len() {
         1 => cedar.run_prompt(),

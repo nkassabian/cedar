@@ -349,7 +349,7 @@ impl Scanner {
             .unwrap_or(TokenType::IDENTIFIER);
 
         self.add_string_token(
-            Object::Nil,
+            Object::Str(text),
             ttype,
             self.source[self.current..self.position].iter().collect(),
         );

@@ -1,8 +1,16 @@
+use std::os::raw::c_void;
+
 use crate::error::*;
 use crate::expr::*;
 
 use crate::object::*;
 
+use crate::stmt;
+use crate::stmt::ExpressionStmt;
+use crate::stmt::PrintStmt;
+use crate::stmt::Stmt;
+use crate::stmt::StmtVisitor;
+use crate::stmt::VarStmt;
 use crate::token::Token;
 use crate::token_type::*;
 
@@ -83,6 +91,26 @@ impl ExprVisitor<Object> for Interpreter {
             Ok(result)
         }
     }
+
+    fn visit_variable_expr(&self, _expr: &VariableExpr) -> Result<Object, CDSyntaxError> {
+        Ok(Object::Nil)
+    }
+}
+
+impl StmtVisitor<()> for Interpreter {
+    fn visit_expression_stmt(&self, expr: &ExpressionStmt) -> Result<(), CDSyntaxError> {
+        self.evaluate(&expr.expression)?;
+        Ok(())
+    }
+
+    fn visit_print_stmt(&self, expr: &PrintStmt) -> Result<(), CDSyntaxError> {
+        self.evaluate(&expr.expression)?;
+        Ok(())
+    }
+
+    fn visit_var_stmt(&self, _expr: &VarStmt) -> Result<(), CDSyntaxError> {
+        Ok(())
+    }
 }
 
 impl Interpreter {
@@ -93,17 +121,14 @@ impl Interpreter {
     fn is_truthy(&self, object: &Object) -> bool {
         !matches!(object, Object::Nil | Object::Bool(false))
     }
-    pub fn interpret(&self, expr: &Expr) -> bool {
-        match self.evaluate(&expr) {
-            Ok(v) => {
-                println!("{}", v);
-                true
-            }
-            Err(e) => {
-                e.report();
-                false
-            }
+    pub fn interpret(&mut self, statements: &Vec<Stmt>) {
+        for statement in statements {
+            self.execute(&statement);
         }
+    }
+
+    pub fn execute(&mut self, stmt: &Stmt) -> () {
+        stmt.accept(self).unwrap();
     }
     pub fn checkNumberOperand(operator: Token, operand: &Object) -> Result<(), CDSyntaxError> {
         if let Object::Num(_) = operand {

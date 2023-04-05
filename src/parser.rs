@@ -1,6 +1,9 @@
 use crate::error::*;
 use crate::expr::*;
 use crate::object::*;
+use crate::stmt::ExpressionStmt;
+use crate::stmt::PrintStmt;
+use crate::stmt::Stmt;
 use crate::token::*;
 use crate::token_type::*;
 pub struct Parser {
@@ -13,15 +16,13 @@ impl Parser {
         Parser { tokens, current: 0 }
     }
 
-    pub fn parse(&mut self) -> Result<Expr, CDSyntaxError> {
-        match self.expression() {
-            Ok(expr) => Ok(expr),
-            Err(e) => {
-                let err = e.clone();
-                err.report();
-                Err(e)
-            }
+    pub fn parse(&mut self) -> Result<Vec<Stmt>, CDSyntaxError> {
+        let mut statements: Vec<Stmt> = Vec::new();
+        while !self.is_at_end() {
+            statements.push(self.statement()?);
         }
+        println!("{:?}", statements);
+        return Ok(statements);
     }
     pub fn syncronize(&mut self) {
         self.advance();
@@ -193,6 +194,18 @@ impl Parser {
             }));
         }
 
+        if self.is_match(&[TokenType::PRINT]) {
+            return Ok(Expr::Variable(VariableExpr {
+                name: self.previous().clone(),
+            }));
+        }
+
+        if self.is_match(&[TokenType::IDENTIFIER]) {
+            return Ok(Expr::Variable(VariableExpr {
+                name: self.previous(),
+            }));
+        }
+
         Err(CDSyntaxError::error(
             CDSyntaxErrorTypes::ENEXPECTED_TOKEN,
             0,
@@ -232,6 +245,7 @@ impl Parser {
         if self.is_at_end() {
             false
         } else {
+            //println!("{} {}", self.peek().ttype == ttype, self.current);
             self.peek().ttype == ttype
         }
     }
@@ -253,5 +267,36 @@ impl Parser {
 
     fn previous(&self) -> Token {
         self.tokens.get(self.current - 1).unwrap().clone()
+    }
+
+    /*
+    ==============================
+            STATEMENTS
+    ==============================
+     */
+
+    fn statement(&mut self) -> Result<Stmt, CDSyntaxError> {
+        if self.tokens.get(self.current).unwrap().ttype == TokenType::PRINT {
+            return self.print_statement();
+        }
+        self.expression_statement()
+    }
+
+    fn print_statement(&mut self) -> Result<Stmt, CDSyntaxError> {
+        let value: Expr = self.expression()?;
+        println!("{}", self.tokens.get(self.current).unwrap());
+        self.current += 1;
+        self.consume(
+            TokenType::SEMICOLON,
+            "Expected ';' after value.".to_string(),
+        )?;
+
+        return Ok(Stmt::Print(PrintStmt { expression: value }));
+    }
+
+    fn expression_statement(&mut self) -> Result<Stmt, CDSyntaxError> {
+        let expr = self.expression()?;
+        self.consume(TokenType::SEMICOLON, "Expect ';' after value.".to_string())?;
+        Ok(Stmt::Expression(ExpressionStmt { expression: expr }))
     }
 }
