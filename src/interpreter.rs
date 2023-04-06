@@ -34,7 +34,7 @@ impl ExprVisitor<Object> for Interpreter {
                 }
             }
             TokenType::MINUS => {
-                Interpreter::checkNumberOperand(expr.operator.clone(), &right)?;
+                Interpreter::check_number_operand(expr.operator.clone(), &right)?;
 
                 match right {
                     Object::Num(num) => Ok(Object::Num(-num)),
@@ -127,7 +127,7 @@ impl Interpreter {
     pub fn execute(&mut self, stmt: &Stmt) -> Result<(), CDSyntaxError> {
         Ok(stmt.accept(self)?)
     }
-    pub fn checkNumberOperand(operator: Token, operand: &Object) -> Result<(), CDSyntaxError> {
+    pub fn check_number_operand(operator: Token, operand: &Object) -> Result<(), CDSyntaxError> {
         if let Object::Num(_) = operand {
             Ok(())
         } else {

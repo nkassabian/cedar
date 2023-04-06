@@ -5,6 +5,10 @@ mod interpreter;
 mod stmt;
 mod token;
 use error::*;
+mod errors {
+    pub(crate) mod lexer_error;
+    pub(crate) mod syntax_error;
+}
 mod object;
 mod parser;
 mod scanner;
@@ -70,9 +74,7 @@ impl Cedar {
             Ok(statements) => {
                 self.interpreter.interpret(&statements);
             }
-            Err(error) => {
-                eprint!("{:?}", error);
-            }
+            Err(error) => error.report(),
         }
         Ok(())
     }

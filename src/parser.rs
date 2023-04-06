@@ -1,4 +1,5 @@
-use crate::error::*;
+use crate::errors::syntax_error::SyntaxError;
+use crate::errors::syntax_error::SyntaxErrorTypes;
 use crate::expr::*;
 use crate::object::*;
 use crate::stmt::ExpressionStmt;
@@ -17,10 +18,10 @@ impl Parser {
         Parser { tokens, current: 0 }
     }
 
-    pub fn parse(&mut self) -> Result<Vec<Stmt>, CDSyntaxError> {
+    pub fn parse(&mut self) -> Result<Vec<Stmt>, SyntaxError> {
         let mut statements: Vec<Stmt> = Vec::new();
         while !self.is_at_end() {
-            statements.push(self.decleration()?);
+            statements.push(self.statement()?);
         }
         return Ok(statements);
     }
@@ -74,11 +75,11 @@ impl Parser {
         }
     }
 
-    pub fn expression(&mut self) -> Result<Expr, CDSyntaxError> {
+    pub fn expression(&mut self) -> Result<Expr, SyntaxError> {
         self.equality()
     }
 
-    fn equality(&mut self) -> Result<Expr, CDSyntaxError> {
+    fn equality(&mut self) -> Result<Expr, SyntaxError> {
         let mut expr = self.comparison()?;
 
         while self.is_match(&[TokenType::BANGEQUAL, TokenType::EQUAL]) {
@@ -94,7 +95,7 @@ impl Parser {
         Ok(expr)
     }
 
-    fn comparison(&mut self) -> Result<Expr, CDSyntaxError> {
+    fn comparison(&mut self) -> Result<Expr, SyntaxError> {
         let mut expr = self.term()?;
 
         while self.is_match(&[
@@ -115,7 +116,7 @@ impl Parser {
         Ok(expr)
     }
 
-    fn term(&mut self) -> Result<Expr, CDSyntaxError> {
+    fn term(&mut self) -> Result<Expr, SyntaxError> {
         let mut expr = self.factor()?;
 
         while self.is_match(&[TokenType::MINUS, TokenType::PLUS]) {
@@ -131,7 +132,7 @@ impl Parser {
         Ok(expr)
     }
 
-    fn factor(&mut self) -> Result<Expr, CDSyntaxError> {
+    fn factor(&mut self) -> Result<Expr, SyntaxError> {
         let mut expr = self.unary()?;
 
         while self.is_match(&[TokenType::SLASH, TokenType::STAR]) {
@@ -147,7 +148,7 @@ impl Parser {
         Ok(expr)
     }
 
-    fn unary(&mut self) -> Result<Expr, CDSyntaxError> {
+    fn unary(&mut self) -> Result<Expr, SyntaxError> {
         if self.is_match(&[TokenType::BANG, TokenType::MINUS]) {
             let operator = self.previous();
             let right = self.unary()?;
@@ -160,7 +161,7 @@ impl Parser {
         Ok(self.primary()?)
     }
 
-    fn primary(&mut self) -> Result<Expr, CDSyntaxError> {
+    fn primary(&mut self) -> Result<Expr, SyntaxError> {
         if self.is_match(&[TokenType::TRUE]) {
             return Ok(Expr::Literal(LiteralExpr {
                 value: Some(Object::Bool(true)),
@@ -192,10 +193,7 @@ impl Parser {
         }
         if self.is_match(&[TokenType::LEFTPAREN]) {
             let expr = self.expression()?;
-            self.consume(
-                TokenType::RIGHTPAREN,
-                "Expect ')' after expression".to_string(),
-            )?;
+            self.consume(TokenType::RIGHTPAREN, ')')?;
             return Ok(Expr::Grouping(GroupingExpr {
                 expression: Box::new(expr),
             }));
@@ -213,26 +211,22 @@ impl Parser {
             }));
         }
 
-        Err(CDSyntaxError::error(
-            CDSyntaxErrorTypes::ENEXPECTED_TOKEN,
-            0,
-            0,
-            "Syntax Error".to_string(),
-            "unrecognized error".to_string(),
-        ))
+        return Err(SyntaxError::new(
+            self.current_tok().line,
+            self.current_tok().position,
+            SyntaxErrorTypes::UnexpectedToken(self.current_tok().clone().lexeme),
+        ));
     }
 
-    fn consume(&mut self, ttype: TokenType, message: String) -> Result<Token, CDSyntaxError> {
+    fn consume(&mut self, ttype: TokenType, message: char) -> Result<Token, SyntaxError> {
         if self.check(ttype) {
             Ok(self.advance())
         } else {
             let p = self.peek();
-            Err(CDSyntaxError::error(
-                CDSyntaxErrorTypes::ENEXPECTED_TOKEN,
-                p.line,
-                0,
-                "Syntax Error".to_string(),
-                message.to_string(),
+            Err(SyntaxError::new(
+                self.current_tok().line,
+                self.current_tok().position,
+                SyntaxErrorTypes::ExpectedToken(message.to_string(), p.lexeme),
             ))
         }
     }
@@ -281,45 +275,46 @@ impl Parser {
     ==============================
      */
 
-    fn statement(&mut self) -> Result<Stmt, CDSyntaxError> {
+    fn statement(&mut self) -> Result<Stmt, SyntaxError> {
         if self.is_match(&[TokenType::PRINT]) {
             return self.print_statement();
         }
         self.expression_statement()
     }
 
-    fn decleration(&mut self) -> Result<Stmt, CDSyntaxError> {
-        if self.is_match(&[TokenType::VAR]) {
-            self.var_declaration()
-        } else {
-            self.statement()
-        }
-        .or_else(|_| {
-            self.synchronize();
-            Err(CDSyntaxError::error(
-                CDSyntaxErrorTypes::ENEXPECTED_TOKEN,
-                0,
-                0,
-                "Syntax Error".to_string(),
-                "Error in decleration".to_string(),
-            ))
-        })
-    }
+    // fn decleration(&mut self) -> Result<Stmt, SyntaxError> {
+    //     Ok(())
+    //     // if self.is_match(&[TokenType::VAR]) {
+    //     //     self.var_declaration()
+    //     // } else {
+    //     //     self.statement()
+    //     // }
+    //     // .or_else(|_| {
+    //     //     self.synchronize();
+    //     //     Err(SyntaxError::new(
+    //     //         self.current_tok().line,
+    //     //         self.current_tok().position,
+    //     //         SyntaxErrorTypes::UnexpectedToken(self.current_tok().clone().lexeme),
+    //     //     ))
+    //     // Err(SyntaxError::error(
+    //     //     SyntaxErrorTypes::ENEXPECTED_TOKEN,
+    //     //     0,
+    //     //     0,
+    //     //     "Syntax Error".to_string(),
+    //     //     "Error in decleration".to_string(),
+    //     // ))
+    //     // })
+    // }
 
-    fn var_declaration(&mut self) -> Result<Stmt, CDSyntaxError> {
-        let name: Token = self
-            .consume(TokenType::IDENTIFIER, "Expected variable name".to_string())
-            .unwrap();
+    fn var_declaration(&mut self) -> Result<Stmt, SyntaxError> {
+        let name: Token = self.consume(TokenType::IDENTIFIER, 'i').unwrap();
 
         let initializer = match self.is_match(&[TokenType::EQUAL]) {
             true => Some(self.expression()?),
             false => None,
         };
 
-        self.consume(
-            TokenType::SEMICOLON,
-            "Expected ';' after variable decleration".to_string(),
-        )?;
+        self.consume(TokenType::SEMICOLON, ';')?;
 
         return Ok(Stmt::Var(VarStmt {
             name: name,
@@ -327,15 +322,19 @@ impl Parser {
         }));
     }
 
-    fn print_statement(&mut self) -> Result<Stmt, CDSyntaxError> {
+    fn current_tok(&mut self) -> &Token {
+        return self.tokens.get(self.current).unwrap();
+    }
+
+    fn print_statement(&mut self) -> Result<Stmt, SyntaxError> {
         let value = self.expression()?;
-        self.consume(TokenType::SEMICOLON, "Expect ';' after value.".to_string())?;
+        self.consume(TokenType::SEMICOLON, ';')?;
         Ok(Stmt::Print(PrintStmt { expression: value }))
     }
 
-    fn expression_statement(&mut self) -> Result<Stmt, CDSyntaxError> {
+    fn expression_statement(&mut self) -> Result<Stmt, SyntaxError> {
         let expr = self.expression()?;
-        self.consume(TokenType::SEMICOLON, "Expect ';' after value.".to_string())?;
+        self.consume(TokenType::SEMICOLON, ';')?;
         Ok(Stmt::Expression(ExpressionStmt { expression: expr }))
     }
 }

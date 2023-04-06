@@ -10,7 +10,7 @@ pub struct Token {
     pub lexeme: String,
     pub literal: Object,
     pub line: usize,
-    position: usize,
+    pub position: usize,
 }
 
 impl Token {
@@ -28,10 +28,6 @@ impl Token {
             line,
             position,
         }
-    }
-
-    pub fn as_string(&self) -> String {
-        self.lexeme.clone()
     }
 }
 

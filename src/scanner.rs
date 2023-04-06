@@ -1,4 +1,5 @@
-use crate::error::CDLexerError;
+use crate::errors::lexer_error::LexerError;
+use crate::errors::lexer_error::LexerErrorTypes;
 use crate::object::*;
 use crate::token::*;
 use crate::token_type::*;
@@ -31,8 +32,8 @@ impl Scanner {
     /// scanning a token, it is reported and the function stops scanning.
     /// At the end, an EOF token is added to the token vector, and the
     /// function returns a reference to the vector of tokens, wrapped
-    /// in a Result indicating success or an error of type CDLexerError.
-    pub fn scan_tokens(&mut self) -> Result<&Vec<Token>, CDLexerError> {
+    /// in a Result indicating success or an error of type LexerError.
+    pub fn scan_tokens(&mut self) -> Result<&Vec<Token>, LexerError> {
         while !self.is_eof() {
             match self.scan_token() {
                 Ok(_) => {}
@@ -139,7 +140,7 @@ impl Scanner {
                 value,
                 Object::Nil,
                 self.line,
-                self.position,
+                self.offset,
             ))
         } else {
             match self.next() {
@@ -163,6 +164,11 @@ impl Scanner {
         //TODO: Add multiline comments
         if self.peek('-') {
             self.next();
+            self.next();
+            while !self.peek('\n') && !self.is_eof() {
+                self.next();
+            }
+            self.next_line();
         }
 
         if self.peek('/') {
@@ -193,7 +199,7 @@ impl Scanner {
     /// is found, it returns a Lexer Error. If the string is successfully
     /// parsed, a string token is added to the tokenizer state.
     // TODO: Add check for new line
-    fn string(&mut self) -> Result<(), CDLexerError> {
+    fn string(&mut self) -> Result<(), LexerError> {
         self.next();
         while !self.peek('"') && !self.is_eof() {
             self.next();
@@ -202,11 +208,10 @@ impl Scanner {
             }
         }
         if self.is_eof() {
-            return Err(CDLexerError::error(
+            return Err(LexerError::new(
                 self.line,
                 self.offset,
-                "Lexer Error".to_string(),
-                format!("{} \"{}\".", "Unexpecter end of string. Expected", "'\'"),
+                LexerErrorTypes::UnexpectedEndOfString,
                 self.file_name.clone(),
                 self.source.clone(),
             ));
@@ -233,7 +238,7 @@ impl Scanner {
             value,
             object_type,
             self.line,
-            self.current,
+            self.offset,
         ))
     }
 
@@ -243,7 +248,7 @@ impl Scanner {
     /// is successfully parsed, a number token is added to the tokenizer
     /// state with the appropriate object type (Num) and token type (NUMBER).
     /// If an invalid number is encountered, it returns a Lexer Error.
-    fn number(&mut self) -> Result<(), CDLexerError> {
+    fn number(&mut self) -> Result<(), LexerError> {
         while {
             let next = self.peak_next();
             self.is_digit(next)
@@ -264,14 +269,10 @@ impl Scanner {
                     self.next();
                 }
             } else {
-                return Err(CDLexerError::error(
+                return Err(LexerError::new(
                     self.line,
                     self.offset,
-                    "Lexer Error".to_string(),
-                    format!(
-                        "{}: \"{}\".",
-                        "Invalid end of number.", "Numbers cannot endw with a floating point."
-                    ),
+                    LexerErrorTypes::InvalidFloatingPoint(),
                     self.file_name.clone(),
                     self.source.clone(),
                 ));
@@ -283,11 +284,10 @@ impl Scanner {
         let number = match value.parse::<f64>() {
             Ok(num) => num,
             Err(_) => {
-                return Err(CDLexerError::error(
+                return Err(LexerError::new(
                     self.line,
                     self.offset,
-                    "Lexer Error".to_string(),
-                    format!("{} \"{}\".", "Invalid number", value),
+                    LexerErrorTypes::InvalidNumber(value),
                     self.file_name.clone(),
                     self.source.clone(),
                 ));
@@ -349,10 +349,10 @@ impl Scanner {
             .unwrap_or(TokenType::IDENTIFIER);
 
         // TODO: CLEAN bool value
-        let mut bool_value = None;
+        let mut bool_value = Some(false);
         if text == "false" {
             bool_value = Some(false);
-        } else if text == "true" {
+        } else {
             bool_value = Some(true);
         }
 
@@ -368,7 +368,7 @@ impl Scanner {
         );
     }
 
-    fn scan_token(&mut self) -> Result<(), CDLexerError> {
+    fn scan_token(&mut self) -> Result<(), LexerError> {
         while !self.is_eof() {
             let c = self.at();
             self.current = self.position;
@@ -398,14 +398,21 @@ impl Scanner {
                     } else if self.is_alpha(c) {
                         self.identifier();
                     } else {
-                        return Err(CDLexerError::error(
+                        return Err(LexerError::new(
                             self.line,
                             self.offset,
-                            "Lexer Error".to_string(),
-                            format!("{} \"{}\".", "Unexpecter charater :", c.to_string()),
+                            LexerErrorTypes::UnexpectedCharacter(c),
                             self.file_name.clone(),
                             self.source.clone(),
                         ));
+                        // return Err(LexerError::error(
+                        //     self.line,
+                        //     self.offset,
+                        //     "Lexer Error".to_string(),
+                        //     format!("{} \"{}\".", "Unexpecter charater :", c.to_string()),
+                        //     self.file_name.clone(),
+                        //     self.source.clone(),
+                        // ));
                     }
                 }
             }

@@ -1,7 +1,6 @@
 use core::fmt;
 use std::{
     cmp::Ordering,
-    fmt::format,
     ops::{Add, Div, Mul, Sub},
 };
 
