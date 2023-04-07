@@ -1,6 +1,7 @@
 use crate::error::*;
-use crate::token::*;
+use crate::tokens::token::*;
 use crate::object::*;
+use crate::errors::syntax_error::*;
 
 pub enum Expr {
     Binary(BinaryExpr),
@@ -11,7 +12,7 @@ pub enum Expr {
 }
 
 impl Expr {
-    pub fn accept<T>(&self, expr_visitor: &dyn ExprVisitor<T>) -> Result<T, CDSyntaxError> {
+    pub fn accept<T>(&self, expr_visitor: &dyn ExprVisitor<T>) -> Result<T, SyntaxError> {
         match self {
             Expr::Binary(v) => v.accept(expr_visitor),
             Expr::Grouping(v) => v.accept(expr_visitor),
@@ -46,39 +47,39 @@ pub struct VariableExpr {
 }
 
 pub trait ExprVisitor<T> {
-    fn visit_binary_expr(&self, expr: &BinaryExpr) -> Result<T, CDSyntaxError>;
-    fn visit_grouping_expr(&self, expr: &GroupingExpr) -> Result<T, CDSyntaxError>;
-    fn visit_literal_expr(&self, expr: &LiteralExpr) -> Result<T, CDSyntaxError>;
-    fn visit_unary_expr(&self, expr: &UnaryExpr) -> Result<T, CDSyntaxError>;
-    fn visit_variable_expr(&self, expr: &VariableExpr) -> Result<T, CDSyntaxError>;
+    fn visit_binary_expr(&self, expr: &BinaryExpr) -> Result<T, SyntaxError>;
+    fn visit_grouping_expr(&self, expr: &GroupingExpr) -> Result<T, SyntaxError>;
+    fn visit_literal_expr(&self, expr: &LiteralExpr) -> Result<T, SyntaxError>;
+    fn visit_unary_expr(&self, expr: &UnaryExpr) -> Result<T, SyntaxError>;
+    fn visit_variable_expr(&self, expr: &VariableExpr) -> Result<T, SyntaxError>;
 }
 
 impl BinaryExpr {
-    pub fn accept<T>(&self, visitor: &dyn ExprVisitor<T>) -> Result<T, CDSyntaxError> {
+    pub fn accept<T>(&self, visitor: &dyn ExprVisitor<T>) -> Result<T, SyntaxError> {
         visitor.visit_binary_expr(self)
     }
 }
 
 impl GroupingExpr {
-    pub fn accept<T>(&self, visitor: &dyn ExprVisitor<T>) -> Result<T, CDSyntaxError> {
+    pub fn accept<T>(&self, visitor: &dyn ExprVisitor<T>) -> Result<T, SyntaxError> {
         visitor.visit_grouping_expr(self)
     }
 }
 
 impl LiteralExpr {
-    pub fn accept<T>(&self, visitor: &dyn ExprVisitor<T>) -> Result<T, CDSyntaxError> {
+    pub fn accept<T>(&self, visitor: &dyn ExprVisitor<T>) -> Result<T, SyntaxError> {
         visitor.visit_literal_expr(self)
     }
 }
 
 impl UnaryExpr {
-    pub fn accept<T>(&self, visitor: &dyn ExprVisitor<T>) -> Result<T, CDSyntaxError> {
+    pub fn accept<T>(&self, visitor: &dyn ExprVisitor<T>) -> Result<T, SyntaxError> {
         visitor.visit_unary_expr(self)
     }
 }
 
 impl VariableExpr {
-    pub fn accept<T>(&self, visitor: &dyn ExprVisitor<T>) -> Result<T, CDSyntaxError> {
+    pub fn accept<T>(&self, visitor: &dyn ExprVisitor<T>) -> Result<T, SyntaxError> {
         visitor.visit_variable_expr(self)
     }
 }

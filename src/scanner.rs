@@ -1,8 +1,8 @@
 use crate::errors::lexer_error::LexerError;
 use crate::errors::lexer_error::LexerErrorTypes;
 use crate::object::*;
-use crate::token::*;
-use crate::token_type::*;
+use crate::tokens::token::*;
+use crate::tokens::token_type::*;
 pub struct Scanner {
     source: Vec<char>,
     tokens: Vec<Token>,
@@ -348,13 +348,11 @@ impl Scanner {
             .cloned()
             .unwrap_or(TokenType::IDENTIFIER);
 
-        // TODO: CLEAN bool value
-        let mut bool_value = Some(false);
-        if text == "false" {
-            bool_value = Some(false);
+        let bool_value = if text == "false" {
+            Some(false)
         } else {
-            bool_value = Some(true);
-        }
+            Some(true)
+        };
 
         let object = match bool_value {
             Some(bool_value) => Object::Bool(bool_value),

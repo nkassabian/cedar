@@ -12,7 +12,7 @@ pub fn generate_ast(output_dir: &String) -> io::Result<()> {
     define_ast(
         output_dir,
         &"Expr".to_string(),
-        &vec!["error", "token", "object"],
+        &vec!["error", "tokens::token", "object", "errors::syntax_error"],
         &vec![
             "Binary   : Box<Expr> left, Token operator, Box<Expr> right".to_string(),
             "Grouping : Box<Expr> expression".to_string(),
@@ -24,7 +24,7 @@ pub fn generate_ast(output_dir: &String) -> io::Result<()> {
     define_ast(
         output_dir,
         &"Stmt".to_string(),
-        &vec!["error", "expr", "token"],
+        &vec!["error", "expr", "tokens::token", "errors::syntax_error"],
         &vec![
             "Expression : Expr expression".to_string(),
             "Print      : Expr expression".to_string(),
@@ -71,7 +71,7 @@ fn define_ast(
     write!(file, "}}\n\n")?;
 
     write!(file, "impl {} {{\n", base_name)?;
-    write!(file, "    pub fn accept<T>(&self, {}_visitor: &dyn {base_name}Visitor<T>) -> Result<T, CDSyntaxError> {{\n", base_name.to_lowercase())?;
+    write!(file, "    pub fn accept<T>(&self, {}_visitor: &dyn {base_name}Visitor<T>) -> Result<T, SyntaxError> {{\n", base_name.to_lowercase())?;
     write!(file, "        match self {{\n")?;
     for t in &tree_types {
         write!(
@@ -98,7 +98,7 @@ fn define_ast(
     for t in &tree_types {
         write!(
             file,
-            "    fn visit_{}_{}(&self, expr: &{}) -> Result<T, CDSyntaxError>;\n",
+            "    fn visit_{}_{}(&self, expr: &{}) -> Result<T, SyntaxError>;\n",
             t.base_class_name.to_lowercase(),
             base_name.to_lowercase(),
             t.class_name
@@ -110,7 +110,7 @@ fn define_ast(
         write!(file, "impl {} {{\n", t.class_name)?;
         write!(
             file,
-            "    pub fn accept<T>(&self, visitor: &dyn {}Visitor<T>) -> Result<T, CDSyntaxError> {{\n",
+            "    pub fn accept<T>(&self, visitor: &dyn {}Visitor<T>) -> Result<T, SyntaxError> {{\n",
             base_name
         )?;
         write!(

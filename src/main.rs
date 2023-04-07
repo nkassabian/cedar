@@ -3,8 +3,10 @@ mod error;
 mod expr;
 mod interpreter;
 mod stmt;
-mod token;
-use error::*;
+mod tokens {
+    pub(crate) mod token;
+    pub(crate) mod token_type;
+}
 mod errors {
     pub(crate) mod lexer_error;
     pub(crate) mod syntax_error;
@@ -12,9 +14,9 @@ mod errors {
 mod object;
 mod parser;
 mod scanner;
-mod token_type;
 // mod expr;
 
+use errors::lexer_error::LexerError;
 use interpreter::*;
 use parser::Parser;
 use scanner::*;
@@ -60,7 +62,7 @@ impl Cedar {
         }
     }
 
-    fn run(&mut self, source: String, file_name: String) -> Result<(), CDLexerError> {
+    fn run(&mut self, source: String, file_name: String) -> Result<(), LexerError> {
         let mut scanner = Scanner::new(source.chars().collect(), file_name);
         let tokens = scanner.scan_tokens();
 

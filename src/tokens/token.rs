@@ -1,5 +1,5 @@
 use crate::object::*;
-use crate::token_type::*;
+use crate::tokens::token_type::*;
 use core::fmt;
 use once_cell::sync::Lazy;
 use std::collections::HashMap;

@@ -1,5 +1,4 @@
-use ansi_term::Colour::{Black, Blue, Purple, Red, Yellow};
-use rayon::string;
+use ansi_term::Colour::Black;
 
 #[derive(Debug, Clone)]
 pub struct SyntaxError {
@@ -18,6 +17,8 @@ pub enum SyntaxErrorTypes {
     MissingOperand(String),
     RedundantOperand(String),
     InvalidSyntax(String),
+    OperandNaN(),
+    InvalidUnary(),
 }
 
 impl SyntaxError {
@@ -28,6 +29,12 @@ impl SyntaxError {
             }
             SyntaxErrorTypes::ExpectedToken(c, d) => {
                 format!("Expected Token \"{}\", got \"{}\".", c, d)
+            }
+            SyntaxErrorTypes::OperandNaN() => {
+                format!("Operand must be a number.")
+            }
+            SyntaxErrorTypes::InvalidUnary() => {
+                format!("Invalid unary expression.")
             }
             SyntaxErrorTypes::UnexpectedCharacter(_) => todo!(),
             SyntaxErrorTypes::UnclosedDelimiter(_) => todo!(),
