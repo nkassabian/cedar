@@ -395,7 +395,15 @@ impl Scanner {
                         self.number()?;
                     } else if self.is_alpha(c) {
                         self.identifier();
-                    } else {
+                    }
+                    // TheDevConnor: 2021-05-01 12:00:00
+                    // This is needed to handle new lines and empty spaces
+                    // Which fixes the issue with the lexer not being able to
+                    // handle new lines and empty spaces
+                    else if  c == '\n' || c == '\r' || c == '\r' {
+                        self.empty_next();
+                    }
+                    else {
                         return Err(LexerError::new(
                             self.line,
                             self.offset,

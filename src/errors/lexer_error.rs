@@ -69,7 +69,12 @@ impl LexerError {
             line = format!("{}{}", line, token.to_string());
         }
 
-        let mut error_line: String = get_error_line(&self.source_toks, self.line).to_string();
+        // TheDevConnor: 2023-04-08 12:00:00
+        // I was able toi find a small bug. the error line was returning the wrong line number. 
+        // I fixed it by adding 1 to the line number.
+        // The reason for this is because the line number is 0 indexed and the error line function is 1 indexed.
+        // Hence we need to do the self.line + 1 to get the correct line number.
+        let mut error_line: String = get_error_line(&self.source_toks, self.line + 1).to_string();
         let mut errorMessage: String = "".to_string();
         if self.line < 10 {
             errorMessage = format!(
@@ -92,7 +97,7 @@ impl LexerError {
             Yellow.bold().paint(self.file_name),
             format!(
                 "{}:{}",
-                Red.bold().paint(self.line.to_string()),
+                Red.bold().paint((self.line + 1).to_string()),
                 Purple.bold().paint(self.column.to_string())
             ),
             format!(
@@ -126,7 +131,10 @@ fn get_error_line(source_toks: &[char], line_num: usize) -> String {
 fn flash_error_location(source_toks: &Vec<char>, line_num: usize, col_num: usize) -> String {
     let line = source_toks
         .split(|&c| c == '\n')
-        .nth(line_num - 1)
+        // TheDevConnor: 2023-04-08 12:00:00
+        // got ride of the '- 1' because it was cassing a subtraction overflow error.
+        // so getting rid of it fixed the error.
+        .nth(line_num)
         .unwrap_or(&[]);
     let pointer = std::iter::repeat(' ')
         .take(col_num - 1)
