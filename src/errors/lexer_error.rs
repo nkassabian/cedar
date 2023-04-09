@@ -51,7 +51,7 @@ impl LexerError {
         return match &self.error_type {
             LexerErrorTypes::UnexpectedEndOfString => "Unexpected end of string".to_string(),
             LexerErrorTypes::UnexpectedCharacter(c) => {
-                format!("Tip: Try to remove or replace this character.")
+                format!("Tip: Try to remove or replace this character: {}.", c)
             }
             LexerErrorTypes::InvalidFloatingPoint() => {
                 format!("Floating point should have a digit after it. \n ")
@@ -80,7 +80,7 @@ impl LexerError {
         // I fixed it by adding 1 to the line number.
         // The reason for this is because the line number is 0 indexed and the error line function is 1 indexed.
         // Hence we need to do the self.line + 1 to get the correct line number.
-        let mut error_line: String = get_error_line(&self.source_toks, self.line + 1).to_string();
+        let error_line: String = get_error_line(&self.source_toks, self.line + 1).to_string();
         let mut error_message: String = "".to_string();
         if self.line < 10 {
             error_message = format!(
@@ -88,11 +88,7 @@ impl LexerError {
                 format!("{}", error_line),
                 format!(
                     "{} {}",
-                    Red.bold().paint(flash_error_location(
-                        &self.source_toks,
-                        self.line,
-                        self.column + 2,
-                    )),
+                    Red.bold().paint(flash_error_location(self.column + 2,)),
                     Red.bold().paint(self.message())
                 ),
             )
@@ -141,14 +137,7 @@ fn get_error_line(source_toks: &[char], line_num: usize) -> String {
     format!("0{} | {}", line_num + 1, line)
 }
 
-fn flash_error_location(source_toks: &Vec<char>, line_num: usize, col_num: usize) -> String {
-    let line = source_toks
-        .split(|&c| c == '\n')
-        // TheDevConnor: 2023-04-08 12:00:00
-        // got ride of the '- 1' because it was cassing a subtraction overflow error.
-        // so getting rid of it fixed the error.
-        .nth(line_num)
-        .unwrap_or(&[]);
+fn flash_error_location(col_num: usize) -> String {
     let pointer = std::iter::repeat(' ')
         .take(col_num - 1)
         .chain(std::iter::once('^'))

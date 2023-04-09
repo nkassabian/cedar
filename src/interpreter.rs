@@ -1,3 +1,5 @@
+use num_traits::Pow;
+
 use crate::errors::syntax_error::SyntaxError;
 use crate::errors::syntax_error::SyntaxErrorTypes;
 use crate::expr::*;
@@ -55,6 +57,7 @@ impl ExprVisitor<Object> for Interpreter {
             TokenType::SLASH => left / right,
             TokenType::STAR => left * right,
             TokenType::PLUS => left + right,
+            TokenType::POW => left.pow(right),
             TokenType::GREATER => Object::Bool(left > right),
             TokenType::LESS => Object::Bool(left < right),
             TokenType::GREATEREQUAL => Object::Bool(left >= right),
@@ -102,7 +105,7 @@ impl Interpreter {
     }
     pub fn interpret(&mut self, statements: &[Stmt]) {
         for statement in statements {
-            self.execute(&statement).unwrap();
+            self.execute(&statement);
         }
     }
 

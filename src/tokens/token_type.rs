@@ -12,6 +12,7 @@ pub enum TokenType {
     SEMICOLON,
     SLASH,
     STAR,
+    POW,
 
     // One or two character tokens.
     BANG,

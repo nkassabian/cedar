@@ -4,6 +4,8 @@ use std::{
     ops::{Add, Div, Mul, Sub},
 };
 
+use num_traits::pow::Pow;
+
 // TODO: Seprate floating point with int
 #[derive(Debug, Clone, PartialEq)]
 pub enum Object {
@@ -93,6 +95,16 @@ impl Add for Object {
     }
 }
 
+impl Pow<Object> for Object {
+    type Output = Object;
+
+    fn pow(self, other: Self) -> Object {
+        match (self, other) {
+            (Object::Num(left), Object::Num(right)) => Object::Num(left.powf(right)),
+            _ => Object::ArithmeticError,
+        }
+    }
+}
 impl PartialOrd for Object {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         match (self, other) {

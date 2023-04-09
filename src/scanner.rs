@@ -2,6 +2,7 @@ use crate::errors::lexer_error::LexerError;
 use crate::errors::lexer_error::LexerErrorTypes;
 use crate::object::*;
 use crate::tokens::token::*;
+use crate::tokens::token_type;
 use crate::tokens::token_type::*;
 pub struct Scanner {
     source: Vec<char>,
@@ -383,6 +384,7 @@ impl Scanner {
                 '*' => self.add_token(TokenType::STAR),
                 '.' => self.add_token(TokenType::DOT),
                 ',' => self.add_token(TokenType::COMMA),
+                '^' => self.add_token(TokenType::POW),
                 ';' => self.add_token(TokenType::SEMICOLON),
                 '!' => self.add_conditional_token('=', TokenType::BANGEQUAL, TokenType::BANG),
                 '=' => self.add_conditional_token('=', TokenType::EQUALEQUAL, TokenType::EQUAL),
@@ -400,10 +402,9 @@ impl Scanner {
                     // This is needed to handle new lines and empty spaces
                     // Which fixes the issue with the lexer not being able to
                     // handle new lines and empty spaces
-                    else if  c == '\n' || c == '\r' || c == '\r' {
+                    else if c == '\n' || c == '\r' || c == '\r' {
                         self.empty_next();
-                    }
-                    else {
+                    } else {
                         return Err(LexerError::new(
                             self.line,
                             self.offset,

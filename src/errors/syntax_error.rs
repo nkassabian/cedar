@@ -1,6 +1,3 @@
-use ansi_term::Colour::Black;
-
-#[derive(Debug)]
 pub struct SyntaxError {
     error_type: SyntaxErrorTypes,
     line: usize,
@@ -8,7 +5,6 @@ pub struct SyntaxError {
     main_message: String,
 }
 
-#[derive(Debug)]
 pub enum SyntaxErrorTypes {
     UnexpectedToken(String),
     ExpectedToken(String, String),
