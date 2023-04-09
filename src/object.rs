@@ -1,7 +1,7 @@
 use core::fmt;
 use std::{
     cmp::Ordering,
-    ops::{Add, Div, Mul, Sub},
+    ops::{Add, Div, Mul, Rem, Sub},
 };
 
 use num_traits::pow::Pow;
@@ -105,6 +105,18 @@ impl Pow<Object> for Object {
         }
     }
 }
+
+impl Rem for Object {
+    type Output = Object;
+
+    fn rem(self, other: Self) -> Object {
+        match (self, other) {
+            (Object::Num(left), Object::Num(right)) => Object::Num(left % right),
+            _ => Object::ArithmeticError,
+        }
+    }
+}
+
 impl PartialOrd for Object {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         match (self, other) {

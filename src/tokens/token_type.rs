@@ -13,6 +13,7 @@ pub enum TokenType {
     SLASH,
     STAR,
     POW,
+    MODULO,
 
     // One or two character tokens.
     BANG,

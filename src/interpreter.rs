@@ -57,6 +57,7 @@ impl ExprVisitor<Object> for Interpreter {
             TokenType::SLASH => left / right,
             TokenType::STAR => left * right,
             TokenType::PLUS => left + right,
+            TokenType::MODULO => left % right,
             TokenType::POW => left.pow(right),
             TokenType::GREATER => Object::Bool(left > right),
             TokenType::LESS => Object::Bool(left < right),

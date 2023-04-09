@@ -135,7 +135,12 @@ impl Parser {
     fn factor(&mut self) -> Result<Expr, SyntaxError> {
         let mut expr = self.unary()?;
 
-        while self.is_match(&[TokenType::SLASH, TokenType::STAR, TokenType::POW]) {
+        while self.is_match(&[
+            TokenType::SLASH,
+            TokenType::STAR,
+            TokenType::POW,
+            TokenType::MODULO,
+        ]) {
             let operator = self.previous();
             let right = self.unary()?;
             expr = Ok(Expr::Binary(BinaryExpr {

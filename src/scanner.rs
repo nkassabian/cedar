@@ -385,6 +385,7 @@ impl Scanner {
                 '.' => self.add_token(TokenType::DOT),
                 ',' => self.add_token(TokenType::COMMA),
                 '^' => self.add_token(TokenType::POW),
+                '%' => self.add_token(TokenType::MODULO),
                 ';' => self.add_token(TokenType::SEMICOLON),
                 '!' => self.add_conditional_token('=', TokenType::BANGEQUAL, TokenType::BANG),
                 '=' => self.add_conditional_token('=', TokenType::EQUALEQUAL, TokenType::EQUAL),
