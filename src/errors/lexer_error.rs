@@ -50,7 +50,9 @@ impl LexerError {
     fn message(&self) -> String {
         return match &self.error_type {
             LexerErrorTypes::UnexpectedEndOfString => "Unexpected end of string".to_string(),
-            LexerErrorTypes::UnexpectedCharacter(c) => format!("Unexpected character"),
+            LexerErrorTypes::UnexpectedCharacter(c) => {
+                format!("Tip: Try to remove or replace this character.")
+            }
             LexerErrorTypes::InvalidFloatingPoint() => {
                 format!("Floating point should have a digit after it. \n ")
             }
@@ -62,6 +64,10 @@ impl LexerError {
     // 1 | have shipSpeedX := 0;
     //                       ^^^ // this is the position of the token in the line above
     // 2 |
+
+    ///reports an error by displaying the relevant code line,
+    /// error message, and error location. It also exits the
+    /// program with a status code of 64.
     pub fn report(self) {
         let mut line: String = "".to_string();
 
@@ -70,14 +76,14 @@ impl LexerError {
         }
 
         // TheDevConnor: 2023-04-08 12:00:00
-        // I was able toi find a small bug. the error line was returning the wrong line number. 
+        // I was able toi find a small bug. the error line was returning the wrong line number.
         // I fixed it by adding 1 to the line number.
         // The reason for this is because the line number is 0 indexed and the error line function is 1 indexed.
         // Hence we need to do the self.line + 1 to get the correct line number.
         let mut error_line: String = get_error_line(&self.source_toks, self.line + 1).to_string();
-        let mut errorMessage: String = "".to_string();
+        let mut error_message: String = "".to_string();
         if self.line < 10 {
-            errorMessage = format!(
+            error_message = format!(
                 "{}\n    {}\n",
                 format!("{}", error_line),
                 format!(
@@ -93,7 +99,7 @@ impl LexerError {
         }
 
         eprint!(
-            "\n\n[{}]->{}::{}\n\n{}",
+            "\n\n[{}] | [{}]:=> {}\n\n{}",
             Yellow.bold().paint(self.file_name),
             format!(
                 "{}:{}",
@@ -101,16 +107,23 @@ impl LexerError {
                 Purple.bold().paint(self.column.to_string())
             ),
             format!(
-                "{} : \n{}",
+                "{}\n{}",
                 Red.bold().paint("Exception Occured"),
                 Blue.bold().paint(self.main_message),
             ),
-            errorMessage
+            error_message
         );
         std::process::exit(64);
     }
 }
 
+// / takes a vector of characters source_toks and a line number line_num,
+/// and returns a formatted string representing the line of the given
+/// line number. It first finds the start and end indices of the line
+/// in the source_toks vector, then creates a substring of the line by
+/// collecting the characters between those indices into a String. Finally,
+/// it formats and returns the line as a string with the line number and a
+/// leading zero followed by a vertical bar (|) separator.
 fn get_error_line(source_toks: &[char], line_num: usize) -> String {
     let line_start = source_toks
         .iter()
@@ -125,7 +138,7 @@ fn get_error_line(source_toks: &[char], line_num: usize) -> String {
         .map(|i| i + line_start)
         .unwrap_or(source_toks.len());
     let line = source_toks[line_start..line_end].iter().collect::<String>();
-    format!("0{} | {}", line_num, line)
+    format!("0{} | {}", line_num + 1, line)
 }
 
 fn flash_error_location(source_toks: &Vec<char>, line_num: usize, col_num: usize) -> String {

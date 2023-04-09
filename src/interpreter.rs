@@ -102,7 +102,7 @@ impl Interpreter {
     }
     pub fn interpret(&mut self, statements: &[Stmt]) {
         for statement in statements {
-            self.execute(&statement);
+            self.execute(&statement).unwrap();
         }
     }
 

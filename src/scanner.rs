@@ -411,14 +411,6 @@ impl Scanner {
                             self.file_name.clone(),
                             self.source.clone(),
                         ));
-                        // return Err(LexerError::error(
-                        //     self.line,
-                        //     self.offset,
-                        //     "Lexer Error".to_string(),
-                        //     format!("{} \"{}\".", "Unexpecter charater :", c.to_string()),
-                        //     self.file_name.clone(),
-                        //     self.source.clone(),
-                        // ));
                     }
                 }
             }

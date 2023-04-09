@@ -25,55 +25,55 @@ impl Parser {
         }
         return Ok(statements);
     }
-    pub fn synchronize(&mut self) {
-        self.advance();
+    // pub fn synchronize(&mut self) {
+    //     self.advance();
 
-        while !self.is_at_end() {
-            if self.previous().ttype == TokenType::SEMICOLON {
-                match self.peek().ttype {
-                    TokenType::CLASS => return,
-                    TokenType::LEFTPAREN => return,
-                    TokenType::RIGHTPAREN => return,
-                    TokenType::LEFTBRACE => return,
-                    TokenType::RIGHTBRACE => return,
-                    TokenType::COMMA => return,
-                    TokenType::DOT => return,
-                    TokenType::MINUS => return,
-                    TokenType::PLUS => return,
-                    TokenType::SEMICOLON => return,
-                    TokenType::SLASH => return,
-                    TokenType::STAR => return,
-                    TokenType::BANG => return,
-                    TokenType::BANGEQUAL => return,
-                    TokenType::EQUAL => return,
-                    TokenType::EQUALEQUAL => return,
-                    TokenType::GREATER => return,
-                    TokenType::GREATEREQUAL => return,
-                    TokenType::LESS => return,
-                    TokenType::LESSEQUAL => return,
-                    TokenType::IDENTIFIER => return,
-                    TokenType::STRING => return,
-                    TokenType::NUMBER => return,
-                    TokenType::AND => return,
-                    TokenType::ELSE => return,
-                    TokenType::FALSE => return,
-                    TokenType::FUNC => return,
-                    TokenType::FOR => return,
-                    TokenType::IF => return,
-                    TokenType::NIL => return,
-                    TokenType::OR => return,
-                    TokenType::PRINT => return,
-                    TokenType::RETURN => return,
-                    TokenType::TRUE => return,
-                    TokenType::HAVE => return,
-                    TokenType::VAR => return,
-                    TokenType::WHILE => return,
-                    TokenType::EOF => return,
-                }
-            }
-            self.advance();
-        }
-    }
+    //     while !self.is_at_end() {
+    //         if self.previous().ttype == TokenType::SEMICOLON {
+    //             match self.peek().ttype {
+    //                 TokenType::CLASS => return,
+    //                 TokenType::LEFTPAREN => return,
+    //                 TokenType::RIGHTPAREN => return,
+    //                 TokenType::LEFTBRACE => return,
+    //                 TokenType::RIGHTBRACE => return,
+    //                 TokenType::COMMA => return,
+    //                 TokenType::DOT => return,
+    //                 TokenType::MINUS => return,
+    //                 TokenType::PLUS => return,
+    //                 TokenType::SEMICOLON => return,
+    //                 TokenType::SLASH => return,
+    //                 TokenType::STAR => return,
+    //                 TokenType::BANG => return,
+    //                 TokenType::BANGEQUAL => return,
+    //                 TokenType::EQUAL => return,
+    //                 TokenType::EQUALEQUAL => return,
+    //                 TokenType::GREATER => return,
+    //                 TokenType::GREATEREQUAL => return,
+    //                 TokenType::LESS => return,
+    //                 TokenType::LESSEQUAL => return,
+    //                 TokenType::IDENTIFIER => return,
+    //                 TokenType::STRING => return,
+    //                 TokenType::NUMBER => return,
+    //                 TokenType::AND => return,
+    //                 TokenType::ELSE => return,
+    //                 TokenType::FALSE => return,
+    //                 TokenType::FUNC => return,
+    //                 TokenType::FOR => return,
+    //                 TokenType::IF => return,
+    //                 TokenType::NIL => return,
+    //                 TokenType::OR => return,
+    //                 TokenType::PRINT => return,
+    //                 TokenType::RETURN => return,
+    //                 TokenType::TRUE => return,
+    //                 TokenType::HAVE => return,
+    //                 TokenType::VAR => return,
+    //                 TokenType::WHILE => return,
+    //                 TokenType::EOF => return,
+    //             }
+    //         }
+    //         self.advance();
+    //     }
+    // }
 
     pub fn expression(&mut self) -> Result<Expr, SyntaxError> {
         self.equality()
@@ -306,21 +306,21 @@ impl Parser {
     //     // })
     // }
 
-    fn var_declaration(&mut self) -> Result<Stmt, SyntaxError> {
-        let name: Token = self.consume(TokenType::IDENTIFIER, 'i').unwrap();
+    // fn var_declaration(&mut self) -> Result<Stmt, SyntaxError> {
+    //     let name: Token = self.consume(TokenType::IDENTIFIER, 'i').unwrap();
 
-        let initializer = match self.is_match(&[TokenType::EQUAL]) {
-            true => Some(self.expression()?),
-            false => None,
-        };
+    //     let initializer = match self.is_match(&[TokenType::EQUAL]) {
+    //         true => Some(self.expression()?),
+    //         false => None,
+    //     };
 
-        self.consume(TokenType::SEMICOLON, ';')?;
+    //     self.consume(TokenType::SEMICOLON, ';')?;
 
-        return Ok(Stmt::Var(VarStmt {
-            name: name,
-            initializer,
-        }));
-    }
+    //     return Ok(Stmt::Var(VarStmt {
+    //         name: name,
+    //         initializer,
+    //     }));
+    // }
 
     fn current_tok(&mut self) -> &Token {
         return self.tokens.get(self.current).unwrap();

@@ -1,6 +1,6 @@
 use ansi_term::Colour::Black;
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct SyntaxError {
     error_type: SyntaxErrorTypes,
     line: usize,
@@ -8,7 +8,7 @@ pub struct SyntaxError {
     main_message: String,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub enum SyntaxErrorTypes {
     UnexpectedToken(String),
     ExpectedToken(String, String),
@@ -66,58 +66,58 @@ impl SyntaxError {
     }
 }
 
-fn get_line(line: usize, error_line: &String, line_num: i32) -> String {
-    if line_num == -1 {
-        return format!(
-            "{}\n",
-            Black.paint(format!(
-                "{} | {}",
-                ("0".to_string() + &(line - 1).to_string()),
-                &error_line[find_nth_index(&error_line, '\n', line - 2).unwrap() + 1
-                    ..find_nth_index(&error_line, '\n', line - 1).unwrap()]
-            ))
-        );
-    } else if line_num == 0 {
-        return format!(
-            "{} | {}",
-            ("0".to_string() + &line.to_string()),
-            &error_line[find_nth_index(&error_line, '\n', line - 1).unwrap() + 1
-                ..find_nth_index(&error_line, '\n', line).unwrap()]
-        );
-    } else if line_num == 1 {
-        if (find_nth_index(&error_line, '\n', line).unwrap() + 1)
-            != find_nth_index(&error_line, '\n', line + 1).unwrap() + 1
-        {
-            return format!(
-                "{}\n",
-                Black.paint(format!(
-                    "{} | {}",
-                    ("0".to_string() + &(line + 1).to_string()),
-                    &error_line[find_nth_index(&error_line, '\n', line).unwrap() + 1
-                        ..find_nth_index(&error_line, '\n', line + 1).unwrap()]
-                ))
-            );
-        } else {
-            return " ".to_string();
-        }
-    } else {
-        return " ".to_string();
-    }
-}
+// fn get_line(line: usize, error_line: &String, line_num: i32) -> String {
+//     if line_num == -1 {
+//         return format!(
+//             "{}\n",
+//             Black.paint(format!(
+//                 "{} | {}",
+//                 ("0".to_string() + &(line - 1).to_string()),
+//                 &error_line[find_nth_index(&error_line, '\n', line - 2).unwrap() + 1
+//                     ..find_nth_index(&error_line, '\n', line - 1).unwrap()]
+//             ))
+//         );
+//     } else if line_num == 0 {
+//         return format!(
+//             "{} | {}",
+//             ("0".to_string() + &line.to_string()),
+//             &error_line[find_nth_index(&error_line, '\n', line - 1).unwrap() + 1
+//                 ..find_nth_index(&error_line, '\n', line).unwrap()]
+//         );
+//     } else if line_num == 1 {
+//         if (find_nth_index(&error_line, '\n', line).unwrap() + 1)
+//             != find_nth_index(&error_line, '\n', line + 1).unwrap() + 1
+//         {
+//             return format!(
+//                 "{}\n",
+//                 Black.paint(format!(
+//                     "{} | {}",
+//                     ("0".to_string() + &(line + 1).to_string()),
+//                     &error_line[find_nth_index(&error_line, '\n', line).unwrap() + 1
+//                         ..find_nth_index(&error_line, '\n', line + 1).unwrap()]
+//                 ))
+//             );
+//         } else {
+//             return " ".to_string();
+//         }
+//     } else {
+//         return " ".to_string();
+//     }
+// }
 
-fn create_string_with_spaces(x: usize, c: char) -> String {
-    let mut s = String::new();
-    for _ in 0..x + 3 {
-        s.push(' ');
-    }
-    s.push(c);
-    s
-}
+// fn create_string_with_spaces(x: usize, c: char) -> String {
+//     let mut s = String::new();
+//     for _ in 0..x + 3 {
+//         s.push(' ');
+//     }
+//     s.push(c);
+//     s
+// }
 
-fn find_nth_index(s: &str, c: char, n: usize) -> Option<usize> {
-    let mut iter = s.char_indices().filter(|&(_, ch)| ch == c).skip(n - 1);
-    match iter.next() {
-        Some((i, _)) => Some(i),
-        None => Some(s.len()),
-    }
-}
+// fn find_nth_index(s: &str, c: char, n: usize) -> Option<usize> {
+//     let mut iter = s.char_indices().filter(|&(_, ch)| ch == c).skip(n - 1);
+//     match iter.next() {
+//         Some((i, _)) => Some(i),
+//         None => Some(s.len()),
+//     }
+// }
