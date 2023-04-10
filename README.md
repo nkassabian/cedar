@@ -10,7 +10,7 @@ Basic Lexer       : ██████████ 100%
 
 Basic Parser      : ██████████ 100%
 
-Basic Interpreter : █░░░░░░░░░ 10%
+Basic Interpreter : ██████████ 100%
 
 ## Features (Not final)
 
