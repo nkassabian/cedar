@@ -80,7 +80,7 @@ impl LexerError {
         // I fixed it by adding 1 to the line number.
         // The reason for this is because the line number is 0 indexed and the error line function is 1 indexed.
         // Hence we need to do the self.line + 1 to get the correct line number.
-        let error_line: String = get_error_line(&self.source_toks, self.line + 1).to_string();
+        let error_line: String = get_error_line(&self.source_toks, self.line).to_string();
         let mut error_message: String = "".to_string();
         if self.line < 10 {
             error_message = format!(
