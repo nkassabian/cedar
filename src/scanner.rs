@@ -2,7 +2,7 @@ use crate::errors::lexer_error::LexerError;
 use crate::errors::lexer_error::LexerErrorTypes;
 use crate::object::*;
 use crate::tokens::token::*;
-use crate::tokens::token_type;
+// use crate::tokens::token_type;
 use crate::tokens::token_type::*;
 pub struct Scanner {
     source: Vec<char>,

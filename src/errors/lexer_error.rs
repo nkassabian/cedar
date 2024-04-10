@@ -113,7 +113,7 @@ impl LexerError {
     }
 }
 
-// / takes a vector of characters source_toks and a line number line_num,
+/// takes a vector of characters source_toks and a line number line_num,
 /// and returns a formatted string representing the line of the given
 /// line number. It first finds the start and end indices of the line
 /// in the source_toks vector, then creates a substring of the line by

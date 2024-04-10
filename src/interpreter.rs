@@ -51,7 +51,6 @@ impl ExprVisitor<Object> for Interpreter {
     fn visit_binary_expr(&self, expr: &BinaryExpr) -> Result<Object, SyntaxError> {
         let left = self.evaluate(&expr.left)?;
         let right = self.evaluate(&expr.right)?;
-        //Interpreter::check_number_operands(&expr.operator, &left, &right);
         let result = match expr.operator.ttype {
             TokenType::MINUS => left - right,
             TokenType::SLASH => left / right,
@@ -113,7 +112,7 @@ impl Interpreter {
     pub fn execute(&mut self, stmt: &Stmt) -> Result<(), SyntaxError> {
         Ok(stmt.accept(self)?)
     }
-    pub fn check_number_operand(operator: Token, operand: &Object) -> Result<(), SyntaxError> {
+    pub fn check_number_operand(_operator: Token, operand: &Object) -> Result<(), SyntaxError> {
         if let Object::Num(_) = operand {
             Ok(())
         } else {
@@ -121,15 +120,15 @@ impl Interpreter {
         }
     }
 
-    fn check_number_operands(
-        operator: &Token,
-        left: &Object,
-        right: &Object,
-    ) -> Result<(), SyntaxError> {
-        if let (Object::Num(_), Object::Num(_)) = (left, right) {
-            Ok(())
-        } else {
-            Err(SyntaxError::new(0, 0, SyntaxErrorTypes::InvalidUnary()))
-        }
-    }
+    // fn check_number_operands(
+    //     operator: &Token,
+    //     left: &Object,
+    //     right: &Object,
+    // ) -> Result<(), SyntaxError> {
+    //     if let (Object::Num(_), Object::Num(_)) = (left, right) {
+    //         Ok(())
+    //     } else {
+    //         Err(SyntaxError::new(0, 0, SyntaxErrorTypes::InvalidUnary()))
+    //     }
+    // }
 }

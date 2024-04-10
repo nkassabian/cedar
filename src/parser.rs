@@ -5,7 +5,7 @@ use crate::object::*;
 use crate::stmt::ExpressionStmt;
 use crate::stmt::PrintStmt;
 use crate::stmt::Stmt;
-use crate::stmt::VarStmt;
+// use crate::stmt::VarStmt;
 use crate::tokens::token::*;
 use crate::tokens::token_type::*;
 pub struct Parser {

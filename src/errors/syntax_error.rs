@@ -8,11 +8,11 @@ pub struct SyntaxError {
 pub enum SyntaxErrorTypes {
     UnexpectedToken(String),
     ExpectedToken(String, String),
-    UnexpectedCharacter(char),
-    UnclosedDelimiter(char),
-    MissingOperand(String),
-    RedundantOperand(String),
-    InvalidSyntax(String),
+    // UnexpectedCharacter(char),
+    // UnclosedDelimiter(char),
+    // MissingOperand(String),
+    // RedundantOperand(String),
+    // InvalidSyntax(String),
     OperandNaN(),
     InvalidUnary(),
 }
@@ -32,11 +32,11 @@ impl SyntaxError {
             SyntaxErrorTypes::InvalidUnary() => {
                 format!("Invalid unary expression.")
             }
-            SyntaxErrorTypes::UnexpectedCharacter(_) => todo!(),
-            SyntaxErrorTypes::UnclosedDelimiter(_) => todo!(),
-            SyntaxErrorTypes::MissingOperand(_) => todo!(),
-            SyntaxErrorTypes::RedundantOperand(_) => todo!(),
-            SyntaxErrorTypes::InvalidSyntax(_) => todo!(),
+            // SyntaxErrorTypes::UnexpectedCharacter(_) => todo!(),
+            // SyntaxErrorTypes::UnclosedDelimiter(_) => todo!(),
+            // SyntaxErrorTypes::MissingOperand(_) => todo!(),
+            // SyntaxErrorTypes::RedundantOperand(_) => todo!(),
+            // SyntaxErrorTypes::InvalidSyntax(_) => todo!(),
         };
         SyntaxError {
             error_type,
